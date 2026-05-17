@@ -340,9 +340,144 @@
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 8px; }
         .empty-state i { font-size: 32px; color: #94a3b8; }
         .empty-state p { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #cbd5e1; }
+
+        /* ── Loading Overlay ── */
+        @keyframes spinBall {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes loadBarPulse {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes fadeOutOverlay {
+            0%   { opacity: 1; pointer-events: all; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            background: #020912;
+            background-image:
+                radial-gradient(ellipse 80% 40% at 50% -10%, rgba(16,185,129,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 90% 80%, rgba(59,130,246,0.07) 0%, transparent 50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+        #loadingOverlay.fade-out {
+            animation: fadeOutOverlay 0.4s ease forwards;
+        }
+        #loadingOverlay.gone { display: none; }
+        .load-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .load-ball-wrap {
+            width: 56px; height: 56px;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.35);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            animation: spinBall 2s linear infinite;
+        }
+        .load-ball-wrap i { font-size: 28px; color: #34d399; }
+        .load-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: #fff; letter-spacing: 2px; }
+        .load-title span { color: #34d399; }
+        .load-bar-wrap {
+            width: 200px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .load-bar {
+            height: 100%;
+            width: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, transparent 0%, #10b981 40%, #34d399 50%, #10b981 60%, transparent 100%);
+            background-size: 200% auto;
+            animation: loadBarPulse 1.4s linear infinite;
+        }
+        .load-status {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        /* ── Loading Error State ── */
+        #loadError {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+            max-width: 300px;
+        }
+        #loadError.visible { display: flex; }
+        .load-error-icon {
+            width: 56px; height: 56px;
+            background: rgba(220,38,38,0.15);
+            border: 1px solid rgba(248,113,113,0.35);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .load-error-icon i { font-size: 24px; color: #f87171; }
+        .load-error-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 20px; font-weight: 800;
+            color: #fff; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .load-error-msg {
+            font-size: 12px; color: #94a3b8; line-height: 1.6;
+        }
+        .load-retry-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 11px 24px; border-radius: 10px;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: #34d399; font-size: 13px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer; transition: 0.15s;
+        }
+        .load-retry-btn:hover { background: rgba(16,185,129,0.25); }
     </style>
 </head>
 <body>
+
+<!-- ── Loading Overlay ── -->
+<div id="loadingOverlay">
+    <div class="load-logo">
+        <div class="load-ball-wrap">
+            <i class="fa-solid fa-futbol"></i>
+        </div>
+        <div class="load-title">eFOOT <span>DERBY</span></div>
+    </div>
+    <div class="load-bar-wrap">
+        <div class="load-bar"></div>
+    </div>
+    <div class="load-status" id="loadStatus">Connecting to database…</div>
+
+    <!-- Error state (hidden until failure) -->
+    <div id="loadError">
+        <div class="load-error-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="load-error-title">Connection Failed</div>
+        <div class="load-error-msg">Could not reach the database.<br>Check your connection and try again.</div>
+        <button class="load-retry-btn" onclick="location.reload()">
+            <i class="fa-solid fa-rotate-right"></i> Retry
+        </button>
+    </div>
+</div>
 
 <div id="menuOverlay" class="menu-overlay" onclick="window.app.closeMenu()"></div>
 
@@ -557,6 +692,35 @@
     </div>
 </div>
 
+<script>
+    // This runs independently of Firebase. If the SDK fails to load (e.g. offline),
+    // the module script never runs and window.app is never defined.
+    // After 18s we check — if app never started, show the error directly via DOM.
+    setTimeout(() => {
+        const overlay = document.getElementById('loadingOverlay');
+        if (!overlay || overlay.classList.contains('gone')) return; // already resolved
+        if (window.app && window.app._dbLoaded) return; // data arrived fine
+
+        // Show error state
+        const barWrap  = document.querySelector('.load-bar-wrap');
+        const status   = document.getElementById('loadStatus');
+        const errPanel = document.getElementById('loadError');
+        const errCode  = document.getElementById('loadErrorCode');
+        const ballWrap = document.querySelector('.load-ball-wrap');
+
+        if (barWrap)  barWrap.style.display = 'none';
+        if (status)   status.style.display  = 'none';
+        if (ballWrap) {
+            ballWrap.style.animation    = 'none';
+            ballWrap.style.background   = 'rgba(220,38,38,0.12)';
+            ballWrap.style.borderColor  = 'rgba(248,113,113,0.3)';
+            const icon = ballWrap.querySelector('i');
+            if (icon) {ballWrap.style.display = 'none'; }
+        }
+        if (errPanel) errPanel.classList.add('visible');
+    }, 10000);
+</script>
+
 <script type="module">
     import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -580,15 +744,62 @@
         data: { settings: { winPts: 3, drawPts: 1, legs: 2 }, teams: [], fixtures: [], standings: [] },
         isAdmin: false,
         filterState: 'all',
+        _dbLoaded: false,
+        _authReady: false,
+
+        _hideLoader() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay || overlay.classList.contains('gone')) return;
+            overlay.classList.add('fade-out');
+            setTimeout(() => overlay.classList.add('gone'), 420);
+        },
+
+        _showError(err) {
+            // Swap loading spinner for error state inside the overlay
+            const barWrap  = document.querySelector('.load-bar-wrap');
+            const status   = document.getElementById('loadStatus');
+            const errPanel = document.getElementById('loadError');
+            const errCode  = document.getElementById('loadErrorCode');
+            const ballWrap = document.querySelector('.load-ball-wrap');
+
+            if (barWrap)  barWrap.style.display  = 'none';
+            if (status)   status.style.display   = 'none';
+            if (ballWrap) {
+                ballWrap.style.animation = 'none';
+                ballWrap.style.background = 'rgba(220,38,38,0.12)';
+                ballWrap.style.borderColor = 'rgba(248,113,113,0.3)';
+                const icon = ballWrap.querySelector('i');
+                if (icon) { icon.className = 'fa-solid fa-wifi'; icon.style.color = '#f87171'; }
+            }
+            if (errCode)  errCode.textContent = err && err.message ? err.message : String(err);
+            if (errPanel) errPanel.classList.add('visible');
+        },
+
+        _tryRender() {
+            if (this._authReady && this._dbLoaded) {
+                this._hideLoader();
+                this.render();
+            }
+        },
 
         init() {
             onAuthStateChanged(auth, user => {
                 this.isAdmin = !!user;
                 this._updateAuthUI();
-                this.render();
+                this._authReady = true;
+                this._tryRender();
             });
 
+            // Firebase won't call the error callback for network failures — it just hangs.
+            // So we set a timeout; if data hasn't arrived in 10s, show the error screen.
+            const dbTimeout = setTimeout(() => {
+                if (!this._dbLoaded) {
+                    this._showError({ message: 'Request timed out. Check your internet connection.' });
+                }
+            }, 18000);
+
             onValue(ref(db, 'seasonData'), snap => {
+                clearTimeout(dbTimeout);
                 if (snap.exists()) {
                     const v = snap.val();
                     this.data = {
@@ -600,8 +811,17 @@
                 } else {
                     this.data = { settings: { winPts: 3, drawPts: 1, legs: 2 }, teams: [], fixtures: [], standings: [] };
                 }
-                this.render();
-            }, err => console.error('DB error:', err));
+                if (!this._dbLoaded) {
+                    this._dbLoaded = true;
+                    this._tryRender();
+                } else {
+                    this.render();
+                }
+            }, err => {
+                console.error('DB error:', err);
+                this._showError(err);
+                // Don't call _tryRender — keep overlay visible showing the error
+            });
         },
 
         _updateAuthUI() {
