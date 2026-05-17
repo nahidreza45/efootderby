@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFootDerby | Mobile Matchday</title>
+    <style>
+        /* Modern CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Base Setup & Premium Font */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #07090f; /* Deep stadium night sky */
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* Stadium Lighting & Pitch Background */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            /* Glowing radial gradients mimicking stadium floodlights */
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 135, 0.08), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.15), transparent 50%);
+        }
+
+        /* Subtle grass stripes using pure CSS */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.01) 0px,
+                rgba(255, 255, 255, 0.01) 40px,
+                transparent 40px,
+                transparent 80px
+            );
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Content Container */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* SVG Football Icon Styling */
+        .icon-container {
+            margin-bottom: 1.5rem;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .icon-container svg {
+            width: 80px;
+            height: 80px;
+            fill: none;
+            stroke: #00ff87; /* Neon grass green */
+            stroke-width: 1.5;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #a0aec0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+        }
+
+        p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-inline: auto;
+        }
+
+        /* Modern eSports-style CTA Button */
+        .play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #00ff87; /* High visibility green */
+            color: #022c22; /* Dark contrast text */
+            text-decoration: none;
+            font-size: 1.125rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 1.25rem 3rem;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 135, 0.3), 
+                        inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Button Hover Dynamics */
+        .play-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 255, 135, 0.5), 
+                        inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+            background: #10e680;
+        }
+
+        .play-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.4);
+        }
+
+        /* Smooth Entrance Animations */
+        @keyframes slideUpFade {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Small screen adjustments */
+        @media (max-width: 480px) {
+            .play-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="hero-section">
+        <div class="content-wrapper">
+            
+            <!-- Pure CSS/SVG Football Icon -->
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke-width="1.5"></circle>
+                    <path d="M12 7 L15.5 9.5 L14 14.5 L10 14.5 L8.5 9.5 Z" stroke-width="1.5"></path>
+                    <path d="M12 7 L12 2" stroke-width="1.5"></path>
+                    <path d="M15.5 9.5 L20.5 8" stroke-width="1.5"></path>
+                    <path d="M8.5 9.5 L3.5 8" stroke-width="1.5"></path>
+                    <path d="M14 14.5 L17 19" stroke-width="1.5"></path>
+                    <path d="M10 14.5 L7 19" stroke-width="1.5"></path>
+                </svg>
+            </div>
+
+            <!-- Main Text Content -->
+            <h1>eFootDerby</h1>
+            <p>Time to settle the group chat debates. Grab your phone, load up eFootball, and let's see who really runs the pitch.</p>
+            
+            <!-- Modern Call to Action -->
+            <a href="./main_page.html" class="play-btn">
+                <span>Enter Matchday</span>
+                <!-- Small arrow icon inside the button -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+
+        </div>
+    </main>
+
+</body>
+</html>
