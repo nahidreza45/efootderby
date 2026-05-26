@@ -3,195 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eFootDerby | Mobile Matchday</title>
+    <title>eFootDerby | Virtual League Manager</title>
+    <meta name="description" content="Track your eFootball friend group league. Live standings, fixtures, and results — all in one place.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Modern CSS Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* Base Setup & Premium Font */
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #07090f; /* Deep stadium night sky */
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-        }
+    :root {
+        --green:     #00ff87;
+        --green-glo: rgba(0,255,135,0.20);
+        --bg:        #07090f;
+        --text:      #f1f5f9;
+        --muted:     #64748b;
+    }
 
-        /* Stadium Lighting & Pitch Background */
-        .hero-section {
-            position: relative;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            /* Glowing radial gradients mimicking stadium floodlights */
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(0, 255, 135, 0.08), transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.15), transparent 50%);
-        }
+    html, body {
+        width: 100%; height: 100%;
+        overflow: hidden;
+        font-family: 'DM Sans', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+    }
 
-        /* Subtle grass stripes using pure CSS */
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.01) 0px,
-                rgba(255, 255, 255, 0.01) 40px,
-                transparent 40px,
-                transparent 80px
-            );
-            z-index: 0;
-            pointer-events: none;
-        }
+    /* ── Background atmosphere (stadium + old-page blue accent) ── */
+    .bg {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+    .bg::before {
+        content: '';
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 65% 55% at 18% 42%, rgba(0,255,135,0.09) 0%, transparent 65%),
+            radial-gradient(ellipse 60% 55% at 84% 58%, rgba(59,130,246,0.08) 0%, transparent 65%),
+            radial-gradient(ellipse 80% 35% at 50% 105%, rgba(0,50,25,0.1) 0%, transparent 55%);
+        animation: bgPulse 8s ease-in-out infinite alternate;
+    }
+    /* Subtle pitch stripe texture (from old design) */
+    .bg::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: repeating-linear-gradient(
+            to bottom,
+            transparent 0px, transparent 62px,
+            rgba(255,255,255,0.010) 62px, rgba(255,255,255,0.010) 124px
+        );
+    }
+    @keyframes bgPulse {
+        from { opacity: 0.5; }
+        to   { opacity: 1; }
+    }
 
-        /* Content Container */
-        .content-wrapper {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 800px;
-            animation: slideUpFade 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+    /* ── Corner brackets (from new design) ── */
+    .corner {
+        position: fixed; width: 48px; height: 48px;
+        z-index: 4; pointer-events: none;
+    }
+    .corner::before, .corner::after {
+        content: ''; position: absolute;
+        background: rgba(0,255,135,0.28);
+    }
+    .corner::before { height: 2px; width: 100%; top: 0; left: 0; }
+    .corner::after  { width: 2px; height: 100%; top: 0; left: 0; }
+    .corner.tl { top: 20px; left: 20px; }
+    .corner.tr { top: 20px; right: 20px; transform: scaleX(-1); }
+    .corner.bl { bottom: 20px; left: 20px; transform: scaleY(-1); }
+    .corner.br { bottom: 20px; right: 20px; transform: scale(-1); }
 
-        /* SVG Football Icon Styling */
-        .icon-container {
-            margin-bottom: 1.5rem;
-            animation: float 6s ease-in-out infinite;
-        }
+    /* ── Floating particles (fewer, smaller than new design) ── */
+    .particles { position: fixed; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+    .pt {
+        position: absolute; bottom: -24px;
+        border-radius: 50%;
+        border: 1px solid rgba(0,255,135,0.18);
+        width: 18px; height: 18px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; opacity: 0;
+        animation: ptRise linear infinite;
+    }
+    @keyframes ptRise {
+        0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+        8%   { opacity: 0.35; }
+        92%  { opacity: 0.07; }
+        100% { transform: translateY(calc(-100vh - 32px)) rotate(var(--spin)); opacity: 0; }
+    }
+    .pt:nth-child(1)  { left: 6%;   animation-duration: 12s; animation-delay: 0s;    --spin:  480deg; }
+    .pt:nth-child(2)  { left: 18%;  animation-duration: 9s;  animation-delay: 2s;    --spin: -360deg; }
+    .pt:nth-child(3)  { left: 32%;  animation-duration: 14s; animation-delay: 4.5s;  --spin:  720deg; }
+    .pt:nth-child(4)  { left: 46%;  animation-duration: 11s; animation-delay: 1s;    --spin: -540deg; }
+    .pt:nth-child(5)  { left: 59%;  animation-duration: 10s; animation-delay: 6s;    --spin:  360deg; }
+    .pt:nth-child(6)  { left: 70%;  animation-duration: 13s; animation-delay: 3s;    --spin: -480deg; }
+    .pt:nth-child(7)  { left: 83%;  animation-duration: 11s; animation-delay: 7.5s;  --spin:  540deg; }
+    .pt:nth-child(8)  { left: 92%;  animation-duration: 9s;  animation-delay: 0.5s;  --spin: -360deg; }
+    .pt:nth-child(9)  { left: 25%;  animation-duration: 13s; animation-delay: 9s;    --spin:  720deg; }
+    .pt:nth-child(10) { left: 76%;  animation-duration: 10s; animation-delay: 5s;    --spin: -480deg; }
 
-        .icon-container svg {
-            width: 80px;
-            height: 80px;
-            fill: none;
-            stroke: #00ff87; /* Neon grass green */
-            stroke-width: 1.5;
-        }
+    /* ── Hero layout ── */
+    .hero {
+        position: relative; z-index: 10;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        min-height: 100vh; padding: 2rem 1.5rem;
+        text-align: center;
+    }
 
-        /* Typography */
-        h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(to right, #ffffff, #a0aec0);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-style: italic;
-        }
+    /* ── Floating football icon (from old design) ── */
+    .ball-wrap {
+        margin-bottom: 1.8rem;
+        animation: ballFloat 6s ease-in-out infinite;
+        filter: drop-shadow(0 0 22px rgba(0,255,135,0.45));
+        animation: enterDown 0.9s cubic-bezier(0.16,1,0.3,1) both, ballFloat 6s 0.9s ease-in-out infinite;
+    }
+    @keyframes ballFloat {
+        0%, 100% { transform: translateY(0px); }
+        50%      { transform: translateY(-16px); }
+    }
+    @keyframes enterDown {
+        from { opacity: 0; transform: translateY(-24px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 
-        p {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            color: #94a3b8;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            max-width: 600px;
-            margin-inline: auto;
-        }
+    /* ── Badge ── */
+    .badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(0,255,135,0.07); border: 1px solid rgba(0,255,135,0.2);
+        border-radius: 100px; padding: 5px 18px;
+        font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+        color: #6ee7b7; margin-bottom: 1.6rem;
+        animation: enterUp 0.9s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .bdot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--green); box-shadow: 0 0 8px var(--green);
+        animation: dotBlink 1.8s ease-in-out infinite;
+    }
+    @keyframes dotBlink {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.22; transform: scale(0.5); }
+    }
 
-        /* Modern eSports-style CTA Button */
-        .play-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: #00ff87; /* High visibility green */
-            color: #022c22; /* Dark contrast text */
-            text-decoration: none;
-            font-size: 1.125rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 1.25rem 3rem;
-            border-radius: 100px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0, 255, 135, 0.3), 
-                        inset 0 -3px 0 rgba(0, 0, 0, 0.1);
-        }
+    /* ── Title ── */
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 900;
+        line-height: 0.9;
+        margin-bottom: 1rem;
+        animation: enterUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    /* The 'e' stays naturally lowercase; we do NOT use text-transform */
+    .title-main {
+        display: block;
+        font-size: clamp(3.8rem, 16vw, 9rem);
+        letter-spacing: -4px;
+        color: #fff;
+    }
+    .title-e {
+        color: var(--green);
+        text-shadow: 0 0 40px rgba(0,255,135,0.55);
+        /* Keep lowercase – no text-transform anywhere in the chain */
+        font-size: 1em;
+    }
+    .title-derby {
+        display: block;
+        font-size: clamp(3.8rem, 16vw, 9rem);
+        letter-spacing: -4px;
+        background: linear-gradient(135deg, #00ff87 0%, #10b981 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 40px rgba(0,255,135,0.38));
+    }
 
-        /* Button Hover Dynamics */
-        .play-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 255, 135, 0.5), 
-                        inset 0 -3px 0 rgba(0, 0, 0, 0.1);
-            background: #10e680;
-        }
+    /* ── Score deco (from new) ── */
+    .score-deco {
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        letter-spacing: 12px;
+        color: rgba(0,255,135,0.15);
+        font-weight: 700; margin-bottom: 1.4rem; user-select: none;
+        font-variant-numeric: tabular-nums;
+        animation: enterUp 0.9s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
 
-        .play-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 5px 15px rgba(0, 255, 135, 0.4);
-        }
+    /* ── Tagline ── */
+    .tagline {
+        font-size: clamp(0.88rem, 2vw, 1.08rem);
+        color: var(--muted);
+        line-height: 1.7; 
+        max-width: 480px;
+        margin: 0 auto 2.2rem;
+        text-align: center;
+        animation: enterUp 0.9s 0.38s cubic-bezier(0.16,1,0.3,1) both;
+    }
 
-        /* Smooth Entrance Animations */
-        @keyframes slideUpFade {
-            0% {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    /* ── CTA ── */
+    .cta {
+        animation: enterUp 0.9s 0.48s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .cta-btn {
+        display: inline-flex; align-items: center; gap: 14px;
+        background: var(--green); color: #011a0d;
+        text-decoration: none;
+        font-family: 'Outfit', sans-serif;
+        font-size: 1rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 2px;
+        padding: 1rem 2.6rem; border-radius: 100px;
+        position: relative; overflow: hidden;
+        transition: all 0.32s cubic-bezier(0.16,1,0.3,1);
+        box-shadow: 0 8px 32px rgba(0,255,135,0.3);
+    }
+    .cta-btn::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, transparent 55%);
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .cta-btn:hover { transform: translateY(-5px) scale(1.04); box-shadow: 0 18px 52px rgba(0,255,135,0.48); }
+    .cta-btn:hover::before { opacity: 1; }
+    .cta-btn:active { transform: translateY(-1px) scale(0.99); }
+    .cta-arrow {
+        width: 26px; height: 26px; border-radius: 50%;
+        background: rgba(0,0,0,0.13);
+        display: flex; align-items: center; justify-content: center;
+        transition: transform 0.28s;
+    }
+    .cta-btn:hover .cta-arrow { transform: translateX(5px); }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
+    /* ── Sub text ── */
+    .sub {
+        margin-top: 1.5rem;
+        font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+        color: rgba(255,255,255,0.15);
+        animation: enterUp 0.9s 0.58s cubic-bezier(0.16,1,0.3,1) both;
+    }
 
-        /* Small screen adjustments */
-        @media (max-width: 480px) {
-            .play-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+    @keyframes enterUp {
+        from { opacity: 0; transform: translateY(24px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media(max-width: 540px) {
+        .title-main, .title-derby { letter-spacing: -2px; }
+        .corner { display: none; }
+    }
     </style>
 </head>
 <body>
 
-    <main class="hero-section">
-        <div class="content-wrapper">
-            
-            <!-- Pure CSS/SVG Football Icon -->
-            <div class="icon-container">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke-width="1.5"></circle>
-                    <path d="M12 7 L15.5 9.5 L14 14.5 L10 14.5 L8.5 9.5 Z" stroke-width="1.5"></path>
-                    <path d="M12 7 L12 2" stroke-width="1.5"></path>
-                    <path d="M15.5 9.5 L20.5 8" stroke-width="1.5"></path>
-                    <path d="M8.5 9.5 L3.5 8" stroke-width="1.5"></path>
-                    <path d="M14 14.5 L17 19" stroke-width="1.5"></path>
-                    <path d="M10 14.5 L7 19" stroke-width="1.5"></path>
-                </svg>
-            </div>
+    <div class="bg"></div>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
 
-            <!-- Main Text Content -->
-            <h1>eFootDerby</h1>
-            <p style="text-align: justify;">Time to settle the debates. Grab your phone, load up eFootball, and let's see who really runs the pitch.</p>
-            
-            <!-- Modern Call to Action -->
-            <a href="./main_page.html" class="play-btn">
-                <span>Enter Matchday</span>
-                <!-- Small arrow icon inside the button -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-            </a>
+    <div class="particles">
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+        <div class="pt">⚽</div>
+    </div>
 
+    <main class="hero">
+
+        <!-- Floating football icon — from old design -->
+        <div class="ball-wrap">
+            <svg viewBox="0 0 120 120" width="100" height="100" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer circle -->
+                <circle cx="60" cy="60" r="54" stroke="#00ff87" stroke-width="2.5" opacity="0.9"/>
+                <!-- Pentagon centre -->
+                <polygon points="60,36 76,48 70,66 50,66 44,48"
+                         stroke="#00ff87" stroke-width="2" fill="rgba(0,255,135,0.07)"/>
+                <!-- Seam lines -->
+                <line x1="60" y1="6"  x2="60" y2="36"  stroke="#00ff87" stroke-width="1.6" opacity="0.55"/>
+                <line x1="76" y1="48" x2="108" y2="38" stroke="#00ff87" stroke-width="1.6" opacity="0.55"/>
+                <line x1="70" y1="66" x2="90"  y2="96" stroke="#00ff87" stroke-width="1.6" opacity="0.55"/>
+                <line x1="50" y1="66" x2="30"  y2="96" stroke="#00ff87" stroke-width="1.6" opacity="0.55"/>
+                <line x1="44" y1="48" x2="12"  y2="38" stroke="#00ff87" stroke-width="1.6" opacity="0.55"/>
+                <!-- Glow ring -->
+                <circle cx="60" cy="60" r="54" stroke="rgba(0,255,135,0.12)" stroke-width="10"/>
+            </svg>
         </div>
+
+        <!-- Badge -->
+        <div class="badge">
+            <span class="bdot"></span>
+            eFootball League Tracker
+        </div>
+
+        <!-- Title -->
+        <h1 class="hero-title">
+            <span class="title-main"><span class="title-e">e</span>FOOT</span>
+            <span class="title-derby">DERBY</span>
+        </h1>
+
+        <!-- Score decoration -->
+        <div class="score-deco">2 — 1</div>
+
+        <!-- Tagline -->
+        <p class="tagline">
+            Time to settle the debates. Grab your phone, load up eFootball and let's see who really runs the pitch.
+        </p>
+
+        <!-- CTA -->
+        <div class="cta">
+            <a href="./main_page.html" class="cta-btn" id="enter-matchday-btn">
+                <span>Enter Matchday</span>
+                <span class="cta-arrow">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="3"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+
+        <p class="sub">Powered by eFootball</p>
+
     </main>
 
 </body>
