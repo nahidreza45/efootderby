@@ -14,49 +14,59 @@
     :root {
         --green:     #00ff87;
         --green-md:  #10b981;
-        --green-dim: rgba(0,255,135,0.08);
+        --green-dim: rgba(0,255,135,0.10);
+        --green-glo: rgba(0,255,135,0.22);
         --gold:      #fbbf24;
-        --gold-dim:  rgba(251,191,36,0.12);
+        --gold-dim:  rgba(251,191,36,0.14);
         --red:       #f87171;
-        --red-dim:   rgba(248,113,113,0.12);
+        --red-dim:   rgba(248,113,113,0.13);
         --blue:      #60a5fa;
+        --blue-dim:  rgba(96,165,250,0.12);
         
-        --bg: #07090f;
-        --surface: rgba(4,8,16,0.6);
-        --surface-hi: rgba(4,8,16,0.9);
-        --border: rgba(255,255,255,0.06);
-        --border-hi: rgba(255,255,255,0.12);
+        --bg: #060810;
+        --bg-2: #0b1120;
+        --surface: rgba(6,10,22,0.72);
+        --surface-hi: rgba(6,10,22,0.95);
+        --border: rgba(255,255,255,0.08);
+        --border-hi: rgba(255,255,255,0.15);
         --text: #f1f5f9;
         --text-2: #cbd5e1;
         --muted: #64748b;
         
         --r: 14px; --r-sm: 8px;
         --gap: 16px;
-        --shadow: 0 8px 30px rgba(0,0,0,0.4);
+        --shadow: 0 8px 40px rgba(0,0,0,0.55);
+        --shadow-glow: 0 8px 40px rgba(0,255,135,0.08);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+    input, textarea, select { -webkit-user-select: auto; user-select: auto; }
     html { scroll-behavior: smooth; }
     body {
         font-family: 'DM Sans', system-ui, sans-serif; font-size: 14px;
         background: var(--bg);
         background-image:
-            radial-gradient(circle at 15% 50%, rgba(0, 255, 135, 0.08), transparent 50%),
-            radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.15), transparent 50%);
+            radial-gradient(ellipse 70% 60% at 15% 55%, rgba(0,255,135,0.07) 0%, transparent 60%),
+            radial-gradient(ellipse 65% 55% at 88% 25%, rgba(37,99,235,0.12) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 50% 100%, rgba(0,40,20,0.18) 0%, transparent 55%);
         color: var(--text); min-height: 100vh;
         position: relative;
         padding-bottom: 80px;
     }
     body::before {
         content: ''; position: fixed; inset: 0;
-        background: repeating-linear-gradient(to bottom, transparent 0px, transparent 62px, rgba(255,255,255,0.01) 62px, rgba(255,255,255,0.01) 124px);
+        background: repeating-linear-gradient(to bottom, transparent 0px, transparent 62px, rgba(255,255,255,0.012) 62px, rgba(255,255,255,0.012) 124px);
         z-index: -1; pointer-events: none;
     }
     @media(min-width:768px){ body { padding-bottom: 0; } }
     .hidden { display: none !important; }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,255,135,0.28); border-radius: 99px; }
-    * { scrollbar-width: thin; scrollbar-color: rgba(0,255,135,0.28) transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,255,135,0.32); border-radius: 99px; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(0,255,135,0.32) transparent; }
+    /* Focus ring for keyboard navigation */
+    :focus-visible { outline: 2px solid rgba(0,255,135,0.6); outline-offset: 2px; border-radius: 4px; }
+    /* Disabled inputs — visitor read-only state */
+    input:disabled, input[disabled] { opacity: 0.45; cursor: not-allowed; }
 
     /* ═══ LOADING ═══ */
     @keyframes spin    { to { transform: rotate(360deg); } }
@@ -115,68 +125,197 @@
     .le-retry:hover { background: rgba(0,255,135,0.18); }
 
     /* ═══ HEADER ═══ */
+    /* ═══ APP HEADER ═══ */
     .app-header {
         position: sticky; top: 0; z-index: 200;
-        background: #0f1624;
-        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-        border-bottom: 1px solid var(--border);
-        padding: 0 18px; height: 56px;
-        display: flex; align-items: center; gap: 10px;
-        border-top-left-radius: 14px;
+        background: linear-gradient(to bottom, rgba(6,9,20,0.99) 0%, rgba(4,7,16,0.98) 100%);
+        backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
         border-top: 2px solid var(--green);
+        /* More vertical room — feels proportional against dashboard */
+        padding: 0 24px;
+        height: 64px;
+        display: flex; align-items: center; gap: 12px;
+        box-shadow: 0 1px 0 rgba(0,255,135,0.05), 0 8px 32px rgba(0,0,0,0.45);
     }
     .app-header::before { display: none; }
 
-    /* Brand — minimal wordmark */
+    /* ── Brand ── */
     .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; flex-shrink: 0; }
     .brand-mark {
-        width: 32px; height: 32px;
-        background: rgba(0, 255, 135, 0.12);
-        border: 1px solid rgba(0, 255, 135, 0.25);
+        width: 36px; height: 36px;
+        background: rgba(0,255,135,0.1);
+        border: 1px solid rgba(0,255,135,0.22);
         border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        color: var(--green); font-size: 16px;
+        color: var(--green); font-size: 17px;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .brand:hover .brand-mark {
+        background: rgba(0,255,135,0.16);
+        border-color: rgba(0,255,135,0.38);
     }
     .brand-name {
-        font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700;
+        font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800;
         letter-spacing: 0.5px; line-height: 1; display: flex; gap: 4px;
     }
     .bn-foot  { color: #ffffff; }
     .bn-derby { color: var(--green); }
 
-    #saveStatus { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green); display: flex; align-items: center; gap: 4px; background: var(--green-dim); border: 1px solid rgba(0,255,135,0.2); border-radius: 5px; padding: 3px 8px; }
+    /* ── Save status chip ── */
+    #saveStatus {
+        font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+        color: var(--green); display: flex; align-items: center; gap: 4px;
+        background: var(--green-dim); border: 1px solid rgba(0,255,135,0.2);
+        border-radius: 5px; padding: 3px 8px;
+    }
     .hdr-space { flex: 1; }
 
-    .hdr-btns { display: flex; align-items: center; gap: 5px; }
-    .hbtn { display: flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: var(--r-sm); font-size: 11px; font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; white-space: nowrap; font-family: inherit; }
-    .hbtn-ghost  { background: rgba(255,255,255,0.05); border: 1px solid var(--border-hi); color: var(--text-2); }
-    .hbtn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--text); }
-    .hbtn-danger { background: var(--red-dim); border: 1px solid rgba(248,113,113,0.25); color: var(--red); }
-    .hbtn-danger:hover { background: rgba(248,113,113,0.18); }
-    .hbtn-success{ background: rgba(16,185,129,0.14); border: 1px solid rgba(16,185,129,0.32); color: #6ee7b7; }
-    .hbtn-success:hover { background: rgba(16,185,129,0.22); }
-    .hbtn-icon   { background: transparent; border: 1px solid var(--border-hi); color: var(--text-2); padding: 6px 8px; }
-    .hbtn-icon:hover { background: rgba(255,255,255,0.07); color: var(--green); border-color: rgba(0,255,135,0.28); }
+    /* ── Button group ── */
+    .hdr-btns { display: flex; align-items: center; gap: 6px; }
 
-    #mobileMenuBtn { display: flex; width: 34px; height: 34px; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border-hi); border-radius: var(--r-sm); color: var(--text-2); cursor: pointer; }
-    @media(min-width:768px) { #mobileMenuBtn { display: none; } }
-    @media(max-width:767px)  { .hdr-btns > *:not(#mobileMenuBtn) { display: none; } }
+    /* Base header button */
+    .hbtn {
+        display: flex; align-items: center; gap: 6px;
+        padding: 7px 13px;
+        border-radius: var(--r-sm);
+        font-size: 11.5px; font-weight: 700;
+        cursor: pointer; border: 1px solid transparent;
+        text-decoration: none; font-family: inherit;
+        white-space: nowrap; letter-spacing: 0.3px;
+        transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.18s;
+    }
+    .hbtn i { font-size: 12px; }
+    .hbtn:active { transform: scale(0.97); }
 
-    #mobileMenu { display: none; position: absolute; top: 58px; right: 14px; width: 220px; flex-direction: column; gap: 6px; padding: 12px; background: rgba(4,8,16,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; z-index: 300; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    /* Ghost (Load, Backup) — green tint */
+    .hbtn-ghost {
+        background: rgba(0,255,135,0.06);
+        border-color: rgba(0,255,135,0.18);
+        color: rgba(0,255,135,0.8);
+    }
+    .hbtn-ghost:hover {
+        background: rgba(0,255,135,0.13);
+        border-color: rgba(0,255,135,0.35);
+        color: var(--green);
+    }
+
+    /* Danger (Reset) — red tint */
+    .hbtn-danger {
+        background: rgba(248,113,113,0.08);
+        border-color: rgba(248,113,113,0.22);
+        color: var(--red);
+    }
+    .hbtn-danger:hover {
+        background: rgba(248,113,113,0.18);
+        border-color: rgba(248,113,113,0.42);
+    }
+
+    /* Success (Export) — emerald tint */
+    .hbtn-success {
+        background: rgba(16,185,129,0.1);
+        border-color: rgba(16,185,129,0.28);
+        color: #6ee7b7;
+    }
+    .hbtn-success:hover {
+        background: rgba(16,185,129,0.2);
+        border-color: rgba(16,185,129,0.48);
+    }
+
+    /* Icon-only (login/logout) */
+    .hbtn-icon {
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.1);
+        color: var(--text-2);
+        padding: 7px 9px;
+    }
+    .hbtn-icon:hover {
+        background: rgba(255,255,255,0.08);
+        color: var(--green);
+        border-color: rgba(0,255,135,0.28);
+    }
+
+    /* ── Hamburger (mobile only) ── */
+    #mobileMenuBtn {
+        display: flex;
+        width: 38px; height: 38px;
+        align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--r-sm);
+        color: var(--text-2); cursor: pointer;
+        transition: background 0.18s, color 0.18s;
+    }
+    #mobileMenuBtn:hover { background: rgba(255,255,255,0.09); color: var(--text); }
+    @media (min-width: 768px) { #mobileMenuBtn { display: none; } }
+    /* Hide all header buttons on mobile except hamburger */
+    @media (max-width: 767px)  { .hdr-btns > *:not(#mobileMenuBtn) { display: none; } }
+
+    /* ── Mobile dropdown menu ── */
+    #mobileMenu {
+        display: none;
+        position: absolute; top: 68px; right: 16px;
+        width: 230px;
+        flex-direction: column; gap: 4px;
+        padding: 10px;
+        background: rgba(4,8,18,0.97);
+        backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 14px; z-index: 300;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.04) inset;
+    }
     #mobileMenu.open { display: flex; }
-    .mm-sep { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0; }
-    .mm-btn { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; color: var(--text-2); background: rgba(255,255,255,0.03); transition: 0.2s; text-align: left; width: 100%; font-family: inherit; }
-    .mm-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); transform: translateX(2px); }
+    .mm-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 2px; }
+    .mm-btn {
+        display: flex; align-items: center; gap: 10px;
+        padding: 11px 14px; border-radius: 9px;
+        font-size: 13.5px; font-weight: 600;
+        cursor: pointer; border: none;
+        color: var(--text-2);
+        background: transparent;
+        transition: background 0.16s, color 0.16s, transform 0.16s;
+        text-align: left; width: 100%; font-family: inherit;
+        min-height: 44px;   /* touch target */
+    }
+    .mm-btn:hover { background: rgba(255,255,255,0.07); color: var(--text); transform: translateX(2px); }
     .mm-btn.danger { color: var(--red); }
-    .mm-btn.danger:hover { background: var(--red-dim); }
+    .mm-btn.danger:hover { background: rgba(248,113,113,0.1); transform: translateX(2px); }
 
+    /* ── Menu overlay ── */
     #menuOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 150; }
     #menuOverlay.open { display: block; }
 
-    /* ═══ DESKTOP TABS — 3 tabs ═══ */
-    #desktopTabs { display: none; background: rgba(4,8,16,0.88); border-bottom: 1px solid var(--border); padding: 0 18px; gap: 0; align-items: center; height: 42px; }
-    @media(min-width:768px){ #desktopTabs { display: flex; } }
-    .dtab { display: flex; align-items: center; gap: 7px; padding: 0 16px; height: 42px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: none; color: var(--muted); background: transparent; border-bottom: 2px solid transparent; transition: all 0.18s; position: relative; bottom: -1px; font-family: inherit; }
+    /* ═══ DESKTOP SUB-NAV TABS ═══ */
+    #desktopTabs {
+        display: none;
+        background: rgba(4,7,16,0.92);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        padding: 0 24px;
+        gap: 0;
+        align-items: center;
+        height: 44px;
+    }
+    @media (min-width: 768px) { #desktopTabs { display: flex; } }
+
+    .dtab {
+        display: flex; align-items: center; gap: 7px;
+        padding: 0 18px;
+        height: 44px;
+        font-size: 11.5px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        cursor: pointer; border: none;
+        color: var(--muted); background: transparent;
+        border-bottom: 2px solid transparent;
+        transition: color 0.18s, border-color 0.18s;
+        position: relative; bottom: -1px;
+        font-family: inherit;
+        min-height: 44px;   /* WCAG touch target */
+    }
+    /* Shift the first tab left so its text aligns perfectly with the brand logo container */
+    .dtab:first-child {
+        margin-left: -18px;
+    }
+    .dtab i { font-size: 13px; }
     .dtab:hover { color: var(--text-2); }
     .dtab.active { color: var(--green); border-bottom-color: var(--green); }
 
@@ -196,9 +335,9 @@
     @keyframes tabFade { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
 
     /* ═══ GLASS ═══ */
-    .glass { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); }
+    .glass { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .glass-raised { background: var(--surface-hi); border: 1px solid var(--border-hi); border-radius: var(--r); box-shadow: var(--shadow); }
-    .panel-head { padding: 13px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .panel-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .panel-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 7px; color: var(--text-2); }
 
     /* ═══ SETUP ═══ */
@@ -237,124 +376,298 @@
     .stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
     .stat-val { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: var(--green); margin-top: 2px; }
 
-    /* ═══ CHAMPION BANNER ═══ */
-    @keyframes champShimmer { 0%{background-position:-400% center} 100%{background-position:400% center} }
-    @keyframes champPulse   { 0%,100%{box-shadow:0 0 10px 0 rgba(251,191,36,0.2), inset 0 0 15px 0 rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.5)} 50%{box-shadow:0 0 35px 8px rgba(251,191,36,0.5), inset 0 0 25px 5px rgba(251,191,36,0.3); border-color:rgba(251,191,36,1)} }
-    @keyframes champGlow    { 0%,100%{text-shadow:0 0 8px rgba(252,211,77,0.3)} 50%{text-shadow:0 0 16px rgba(252,211,77,0.7),0 0 30px rgba(252,211,77,0.2)} }
-    @keyframes crownBounce  { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-5px) scale(1.05)} }
-    @keyframes starSpinBounce {
-        0%,100%{transform:translateY(0) rotate(0deg) scale(1); text-shadow:0 0 6px rgba(251,191,36,0.4)}
-        50%{transform:translateY(-6px) rotate(180deg) scale(1.2); text-shadow:0 0 12px rgba(251,191,36,0.9),0 0 24px rgba(251,191,36,0.6); color:#fff}
+    /* ═══════════════════════════════════════════
+       CHAMPION CARD — Full Redesign
+    ═══════════════════════════════════════════ */
+
+    /* Entry: scale up + fade in */
+    @keyframes champEnter {
+        from { opacity: 0; transform: scale(0.94) translateY(8px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0); }
     }
-    @keyframes confettiFall {
-        0% { background-position: 0 0, 40px 20px, 80px 50px; }
-        100% { background-position: 20px 250px, -20px 300px, 50px 220px; }
+    /* Ambient border shimmer — gold streak sweeping around */
+    @keyframes champShimmer {
+        0%   { background-position: 200% center; }
+        100% { background-position: -200% center; }
+    }
+    /* Crown float */
+    @keyframes crownFloat {
+        0%,100% { transform: translateY(0); }
+        50%     { transform: translateY(-4px); }
+    }
+    /* Subtle border glow pulse */
+    @keyframes borderPulse {
+        0%,100% { opacity: 0.55; }
+        50%     { opacity: 1; }
     }
 
+    /* ── Outer wrapper: handles the gradient-border + entry anim ── */
     .champ-banner {
-        position: relative; overflow: hidden;
-        background: linear-gradient(135deg, rgba(120,53,15,0.4) 0%, rgba(12,8,2,0.97) 50%, rgba(120,53,15,0.4) 100%);
-        border: none;
-        border-top: 2px solid rgba(251,191,36,0.7);
-        border-bottom: 2px solid rgba(251,191,36,0.7);
-        border-radius: var(--r); padding: 15px 18px;
-        display: flex; align-items: center; gap: 14px;
-        animation: champPulse 4.5s ease-in-out infinite;
+        position: relative;
+        border-radius: 16px;
+        padding: 2px;                          /* space for the gradient border */
+        /* gradient border via background on the wrapper */
+        background: linear-gradient(
+            110deg,
+            rgba(180,130,20,0.6)  0%,
+            rgba(252,211,77,0.95) 30%,
+            rgba(251,191,36,1)    50%,
+            rgba(252,211,77,0.95) 70%,
+            rgba(180,130,20,0.6)  100%
+        );
+        background-size: 200% auto;
+        animation:
+            champEnter  0.5s cubic-bezier(0.16,1,0.3,1) both,
+            champShimmer 3s linear infinite;
+        cursor: default;
+        transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+                    box-shadow 0.3s cubic-bezier(0.16,1,0.3,1);
+        will-change: transform;
     }
-    .champ-banner::before {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.1) 45%, rgba(252,211,77,0.3) 50%, rgba(255,255,255,0.1) 55%, transparent 75%);
-        background-size: 400% auto; animation: champShimmer 6s linear infinite; pointer-events: none;
+    .champ-banner:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 32px rgba(251,191,36,0.2), 0 2px 8px rgba(0,0,0,0.4);
     }
-    .champ-banner::after {
-        content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.45;
-        background-image:
-            radial-gradient(circle, #fbbf24 2.5px, transparent 3px),
-            radial-gradient(circle, #fcd34d 4px, transparent 4.5px),
-            radial-gradient(circle, #f59e0b 2px, transparent 2.5px);
-        background-size: 80px 80px, 130px 130px, 60px 60px;
-        background-position: 0 0, 40px 20px, 80px 50px;
-        animation: confettiFall 7s linear infinite;
+    /* Remove old pseudo-element shimmer — shimmer now lives on wrapper bg */
+    .champ-banner::before { display: none; }
+    .champ-banner::after  { display: none; }
+
+    /* ── Inner card: the actual dark glass content area ── */
+    .champ-inner {
+        position: relative;
+        border-radius: 14px;                   /* 16 - 2 = 14 so border shows */
+        background: linear-gradient(
+            145deg,
+            rgba(8,10,20,0.97) 0%,
+            rgba(12,10,4,0.97) 100%
+        );
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 18px 20px;
+        display: flex; align-items: center; gap: 16px;
+        overflow: hidden;
     }
+    /* Very faint top-edge gold line for depth */
+    .champ-inner::before {
+        content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+        background: linear-gradient(to right, transparent, rgba(252,211,77,0.35), transparent);
+        pointer-events: none;
+    }
+
+    /* ── Crown circle ── */
     .champ-icon-wrap {
         position: relative; z-index: 2; flex-shrink: 0;
-        width: 46px; height: 46px;
-        background: radial-gradient(circle, rgba(252,211,77,0.2) 0%, transparent 70%);
-        border: 1px solid rgba(252,211,77,0.38); border-radius: 50%;
+        width: 52px; height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(252,211,77,0.15) 0%, rgba(251,191,36,0.04) 100%);
+        border: 1.5px solid rgba(252,211,77,0.4);
         display: flex; align-items: center; justify-content: center;
-        font-size: 18px; color: var(--gold);
-        animation: crownBounce 2.4s ease-in-out infinite;
-        box-shadow: 0 0 16px rgba(252,211,77,0.22);
+        font-size: 22px; color: #fcd34d;
+        animation: crownFloat 2.8s ease-in-out infinite;
+        flex-shrink: 0;
     }
+
+    /* ── Text body ── */
     .champ-body { position: relative; z-index: 2; flex: 1; min-width: 0; }
-    .champ-lbl { font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #d97706; margin-bottom: 2px; }
-    .champ-name { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 900; color: var(--gold); text-transform: uppercase; animation: champGlow 4s ease-in-out infinite; white-space: nowrap; }
-    .champ-stars { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
-    .champ-stars i { color: var(--gold); display: inline-block; }
-    .champ-stars i:nth-child(1) { font-size: 16px; opacity: 1; animation: starSpinBounce 3s ease-in-out infinite; }
-    .champ-stars i:nth-child(2) { font-size: 11px; opacity: 0.9; animation: starSpinBounce 3s ease-in-out infinite 1s; }
-    .champ-stars i:nth-child(3) { font-size: 8px; opacity: 0.7; animation: starSpinBounce 3s ease-in-out infinite 2s; }
+    .champ-lbl {
+        font-size: 9px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase;
+        color: rgba(252,211,77,0.5); margin-bottom: 5px;
+    }
+    .champ-name {
+        font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 900;
+        /* Metallic gold gradient text */
+        background: linear-gradient(135deg, #fde68a 0%, #fbbf24 45%, #fde68a 70%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── Decorative right-side stars ── */
+    .champ-stars {
+        position: relative; z-index: 2;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 5px; flex-shrink: 0; padding: 0 2px;
+    }
+    .champ-stars i { color: #fcd34d; display: inline-block; }
+    .champ-stars i:nth-child(1) { font-size: 14px; animation: borderPulse 2s ease-in-out infinite; }
+    .champ-stars i:nth-child(2) { font-size: 10px; animation: borderPulse 2s ease-in-out infinite 0.7s; }
+    .champ-stars i:nth-child(3) { font-size: 7px;  animation: borderPulse 2s ease-in-out infinite 1.4s; }
 
     /* ═══ FIXTURES (home-integrated) ═══ */
-    .fix-filters { display: flex; gap: 5px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); border-radius: var(--r) var(--r) 0 0; }
-    .fbtn { padding: 6px 13px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text-2); transition: 0.15s; font-family: inherit; }
-    .fbtn.on  { background: var(--green-dim); border-color: rgba(0,255,135,0.36); color: #6ee7b7; }
-    .fbtn:hover:not(.on) { background: rgba(255,255,255,0.08); color: var(--text); }
-    #fixturesList { padding: 10px 13px 13px; }
+    .fix-filters { display: flex; gap: 5px; padding: 11px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.018); border-radius: var(--r) var(--r) 0 0; }
+    .fbtn { padding: 6px 13px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--muted); transition: all 0.15s; font-family: inherit; }
+    .fbtn.on  { background: var(--green-dim); border-color: rgba(0,255,135,0.4); color: var(--green); box-shadow: 0 0 12px rgba(0,255,135,0.1); }
+    .fbtn:hover:not(.on) { background: rgba(255,255,255,0.08); color: var(--text-2); border-color: var(--border-hi); }
+    #fixturesList { padding: 10px 16px 14px; }
 
-    .md-hdr { display: flex; align-items: center; gap: 7px; margin: 11px 0 6px; }
+    .md-hdr { display: flex; align-items: center; gap: 7px; margin: 12px 0 6px; }
     .md-hdr:first-child { margin-top: 0; }
-    .md-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.18); flex-shrink: 0; }
-    .md-badge.done { background: rgba(0,255,135,0.08); color: var(--green); border-color: rgba(0,255,135,0.18); }
-    .md-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--border), transparent); }
+    .md-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: rgba(96,165,250,0.1); color: var(--blue); border: 1px solid rgba(96,165,250,0.22); flex-shrink: 0; }
+    .md-badge.done { background: rgba(0,255,135,0.1); color: var(--green); border-color: rgba(0,255,135,0.28); box-shadow: 0 0 8px rgba(0,255,135,0.08); }
+    .md-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(255,255,255,0.1), transparent); }
     .md-count { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); flex-shrink: 0; }
 
-    .match-card { border-radius: 9px; padding: 8px 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 7px; margin-bottom: 5px; transition: border-color 0.18s, background 0.18s; }
-    .match-card.played { background: rgba(255,255,255,0.035); border-color: var(--border-hi); }
-    .match-card.score-flash { animation: flashGreen 0.55s ease; }
-    @keyframes flashGreen { 0%{background:rgba(0,255,135,0.12);border-color:rgba(0,255,135,0.44)} 100%{background:rgba(255,255,255,0.035);border-color:var(--border-hi)} }
+    /* ── Match card: single-panel layout matching reference image ── */
+    .match-card {
+        border-radius: 10px;
+        padding: 8px 10px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid var(--border);
+        display: flex; flex-direction: column; gap: 6px;
+        margin-bottom: 5px;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .match-card.played {
+        background: rgba(0,255,135,0.03);
+        border-color: rgba(0,255,135,0.18);
+    }
+    .match-card:not(.played):hover { background: rgba(255,255,255,0.04); border-color: var(--border-hi); }
+    .match-card.score-flash { animation: flashGreen 0.5s ease; }
+    @keyframes flashGreen {
+        0%   { background: rgba(0,255,135,0.13); border-color: rgba(0,255,135,0.45); }
+        100% { background: rgba(0,255,135,0.03); border-color: rgba(0,255,135,0.18); }
+    }
 
-    .mc-top { display: flex; align-items: center; justify-content: space-between; }
-    .mc-id { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; color: var(--blue); }
-    .mc-status { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
+    .mc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    /* M·01 label — dim blue when pending, bright green when played */
+    .mc-id { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(96,165,250,0.5); transition: color 0.25s; }
+    .mc-id.played { color: var(--green); }
+    .mc-status { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; }
     .mc-status.tbd { color: var(--muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
-    .mc-status.ft  { color: var(--green); background: rgba(0,255,135,0.08); border: 1px solid rgba(0,255,135,0.18); }
+    .mc-status.ft  { color: var(--green); background: rgba(0,255,135,0.1); border: 1px solid rgba(0,255,135,0.28); }
 
-    .mc-row { display: flex; align-items: center; gap: 8px; }
-    .mc-team { flex: 1; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); display: flex; align-items: center; gap: 6px; min-width: 0; }
-    .mc-team.home { flex-direction: row-reverse; }
-    .mc-team.winner { color: #fff; font-weight: 900; text-shadow: 0 0 10px rgba(255,255,255,0.25); }
-    .mc-team.draw { color: var(--text-2); }
+    /* ── mc-row: full-width pill layout ── */
+    .mc-row {
+        display: flex; align-items: center; gap: 8px;
+    }
+    /* Team name pill — takes equal space on each side */
+    .mc-team {
+        flex: 1; font-size: 13px; font-weight: 500;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        /* Default: unplayed — muted */
+        color: var(--muted);
+        display: flex; align-items: center; min-width: 0;
+        padding: 6px 10px; border-radius: 8px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        transition: color 0.22s, background 0.22s;
+    }
+    /* Home team text aligns right */
+    .mc-team.home { justify-content: flex-end; }
+    /* Away team text aligns left */
+    .mc-team.away { justify-content: flex-start; }
+    /* Winner — bright white, bold, green inner border */
+    .mc-team.winner {
+        color: #ffffff;
+        font-weight: 600;
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.10);
+        border-left: 2px solid rgba(0,255,135,0.55);
+    }
+    .mc-team.home.winner {
+        border-left: 1px solid rgba(255,255,255,0.10);
+        border-right: 2px solid rgba(0,255,135,0.55);
+    }
+    /* Loser — same white contrast as winner, red inner border signals the loss */
+    .mc-team.loser {
+        color: #ffffff;
+        font-weight: 600;
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.10);
+        border-left: 2px solid rgba(239,68,68,0.55);
+    }
+    .mc-team.home.loser {
+        border-left: 1px solid rgba(255,255,255,0.05);
+        border-right: 2px solid rgba(239,68,68,0.55);
+    }
+    /* Draw — same white contrast, amber inner border signals the draw */
+    .mc-team.draw {
+        color: #ffffff;
+        font-weight: 600;
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255,255,255,0.10);
+        border-left: 2px solid rgba(251,191,36,0.5);
+    }
+    .mc-team.home.draw {
+        border-left: 1px solid rgba(255,255,255,0.08);
+        border-right: 2px solid rgba(251,191,36,0.5);
+    }
     .mc-team span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .score-box { display: flex; align-items: center; gap: 3px; flex-shrink: 0; background: rgba(0,0,0,0.4); border: 1px solid var(--border-hi); border-radius: 7px; padding: 3px 6px; }
-    .score-in { width: 34px !important; height: 34px !important; padding: 0 !important; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; border-radius: 5px; border: 1px solid transparent; outline: none; background: transparent; color: var(--text); -webkit-appearance: none; appearance: none; }
+    /* ─── Score box ─── */
+    .score-box {
+        display: flex; align-items: center; gap: 0;
+        flex-shrink: 0;
+        background: rgba(4,10,26,0.9);
+        /* Always show green border — it's the centrepiece */
+        border: 1px solid rgba(0,255,135,0.35);
+        border-radius: 10px;
+        padding: 0; overflow: hidden;
+    }
+    /* Unplayed: border stays but dimmer */
+    .match-card:not(.played) .score-box {
+        border-color: rgba(255,255,255,0.1);
+    }
+    .score-half {
+        width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'JetBrains Mono', monospace; font-size: 19px; font-weight: 800;
+        /* Unplayed: dim placeholder */
+        color: rgba(255,255,255,0.25);
+        background: transparent;
+        transition: color 0.2s;
+    }
+    /* Played: ALL score digits are bright white regardless of win/lose/draw */
+    .score-half.win   { color: #ffffff; }
+    .score-half.lose  { color: #ffffff; }
+    .score-half.draw-s{ color: #ffffff; }
+    /* Admin editable inputs */
+    .score-in {
+        width: 42px !important; height: 42px !important;
+        padding: 0 !important; text-align: center;
+        font-family: 'JetBrains Mono', monospace; font-size: 19px; font-weight: 800;
+        border-radius: 0; border: none; outline: none;
+        background: transparent; color: rgba(255,255,255,0.4);
+        -webkit-appearance: none; appearance: none;
+        transition: color 0.2s, background 0.2s;
+    }
     .score-in::-webkit-inner-spin-button, .score-in::-webkit-outer-spin-button { -webkit-appearance: none; }
     .score-in[type=number] { -moz-appearance: textfield; }
-    .score-in.admin { background: rgba(2,8,20,0.8); color: var(--green); border-color: rgba(255,255,255,0.08); }
-    .score-in.admin:focus { border-color: rgba(0,255,135,0.48); box-shadow: 0 0 0 2px rgba(0,255,135,0.09); }
-    .score-sep { font-size: 11px; font-weight: 900; color: var(--muted); }
+    .score-in.admin { color: rgba(255,255,255,0.75); }
+    .score-in.admin:focus { color: var(--green); background: rgba(0,255,135,0.06); }
+    /* Vertical divider between score halves */
+    .score-div {
+        width: 1px; height: 22px;
+        background: rgba(255,255,255,0.14);
+        flex-shrink: 0;
+    }
 
     .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 16px; gap: 9px; text-align: center; }
     .empty-state i { font-size: 30px; color: var(--muted); }
     .empty-state p { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2); }
 
-    /* ═══ AVATAR ═══ */
     /* ═══ TABLE TAB ═══ */
     .table-wrap { overflow-x: auto; }
+    .table-wrap::-webkit-scrollbar { height: 3px; }
     table { width: 100%; min-width: 480px; border-collapse: collapse; }
-    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid var(--border); white-space: nowrap; }
-    td { padding: 8px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-2); }
+    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; background: rgba(255,255,255,0.02); }
+    td { padding: 9px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-2); }
     tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.025); }
     .pos-badge { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 5px; background: rgba(255,255,255,0.08); font-size: 10px; font-weight: 700; }
-    .pos-1 { background: rgba(251,191,36,0.2);  color: var(--gold);   }
-    tr.row-first td { background: rgba(251,191,36,0.03); }
-    tr.row-first td:first-child { border-left: 2px solid rgba(251,191,36,0.32); }
+    .pos-1 { background: rgba(251,191,36,0.22); color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.15); }
+    tr.row-first td { background: rgba(251,191,36,0.04); }
+    tr.row-first td:first-child { border-left: 2px solid rgba(251,191,36,0.4); }
+    tr.row-first:hover td { background: rgba(251,191,36,0.06); }
     .player-cell { display: flex; align-items: center; gap: 8px; }
     .form-dots { display: flex; align-items: center; justify-content: center; gap: 3px; }
-    .fdot { width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 8px; font-weight: 900; color: #fff; }
-    .fdot-W { background: #059669; }
-    .fdot-D { background: #d97706; }
+    .fdot { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 8px; font-weight: 900; color: #fff; }
+    .fdot-W { background: #059669; box-shadow: 0 0 6px rgba(5,150,105,0.4); }
+    .fdot-D { background: #b45309; }
     .fdot-L { background: #dc2626; }
 
     /* ═══ HISTORY TAB ═══ */
@@ -466,11 +779,11 @@
     <div class="hdr-space"></div>
     <div class="hdr-btns">
         <label class="admin-ctrl hbtn hbtn-ghost hidden" title="Load backup">
-            <i class="fa-solid fa-folder-open" style="color:var(--green);"></i> Load
+            <i class="fa-solid fa-folder-open"></i> Load
             <input type="file" accept=".json" class="hidden" onchange="window.app.loadJson(event)">
         </label>
         <button class="admin-ctrl hbtn hbtn-ghost hidden" onclick="window.app.downloadJson()">
-            <i class="fa-solid fa-floppy-disk" style="color:var(--green);"></i> Backup
+            <i class="fa-solid fa-floppy-disk"></i> Backup
         </button>
         <button class="admin-ctrl hbtn hbtn-danger hidden" onclick="window.app.clearData()">
             <i class="fa-solid fa-trash-can"></i> Reset
@@ -478,23 +791,23 @@
         <button class="hbtn hbtn-success" onclick="window.app.exportExcel()">
             <i class="fa-solid fa-file-excel"></i> Export
         </button>
-        <button class="logout-btn hbtn hbtn-icon hidden" onclick="window.app.logout()" style="color:var(--blue);border-color:rgba(96,165,250,0.28);">
+        <button class="logout-btn hbtn hbtn-icon hidden" onclick="window.app.logout()">
             <i class="fa-solid fa-right-from-bracket"></i>
         </button>
-        <button class="login-btn hbtn hbtn-icon" onclick="window.app.openLogin()" style="color:var(--green);">
+        <button class="login-btn hbtn hbtn-icon" onclick="window.app.openLogin()">
             <i class="fa-solid fa-lock"></i>
         </button>
         <button id="mobileMenuBtn" onclick="window.app.toggleMenu()">
             <i class="fa-solid fa-bars"></i>
         </button>
     </div>
-    <div id="mobileMenu" class="glass-raised">
+    <div id="mobileMenu">
         <label class="admin-ctrl mm-btn hidden">
-            <i class="fa-solid fa-folder-open" style="color:var(--green);"></i> Load Backup
+            <i class="fa-solid fa-folder-open"></i> Load Backup
             <input type="file" accept=".json" class="hidden" onchange="window.app.loadJson(event); window.app.closeMenu();">
         </label>
         <button class="admin-ctrl mm-btn hidden" onclick="window.app.downloadJson(); window.app.closeMenu();">
-            <i class="fa-solid fa-floppy-disk" style="color:var(--green);"></i> Backup
+            <i class="fa-solid fa-floppy-disk"></i> Backup
         </button>
         <button class="admin-ctrl mm-btn danger hidden" onclick="window.app.clearData(); window.app.closeMenu();">
             <i class="fa-solid fa-trash-can"></i> Reset Season
@@ -504,10 +817,10 @@
             <i class="fa-solid fa-file-excel" style="color:#6ee7b7;"></i> Export Excel
         </button>
         <div class="mm-sep"></div>
-        <button class="logout-btn mm-btn hidden" style="color:var(--blue);" onclick="window.app.logout(); window.app.closeMenu();">
+        <button class="logout-btn mm-btn hidden" onclick="window.app.logout(); window.app.closeMenu();">
             <i class="fa-solid fa-right-from-bracket"></i> Sign Out
         </button>
-        <button class="login-btn mm-btn" style="color:var(--green);" onclick="window.app.openLogin(); window.app.closeMenu();">
+        <button class="login-btn mm-btn" onclick="window.app.openLogin(); window.app.closeMenu();">
             <i class="fa-solid fa-lock"></i> Admin Login
         </button>
     </div>
@@ -541,7 +854,7 @@
                 <div class="setup-grid">
                     <div>
                         <label class="block-label">Players — one per line</label>
-                        <textarea id="teamInput" rows="10" placeholder="Nahid&#10;Sahil&#10;Mubin&#10;Fahad"></textarea>
+                        <textarea id="teamInput" rows="10" placeholder="Barcelona&#10;Arsenal&#10;Chelsea&#10;Liverpool"></textarea>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:16px;">
                         <div>
@@ -589,17 +902,19 @@
 
             <!-- Single champion banner — only when all matches complete -->
             <div id="champBanner" class="champ-banner hidden">
-                <div class="champ-icon-wrap">
-                    <i class="fa-solid fa-crown"></i>
-                </div>
-                <div class="champ-body">
-                    <div class="champ-lbl">Season Champion</div>
-                    <div class="champ-name" id="champName">—</div>
-                </div>
-                <div class="champ-stars">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
+                <div class="champ-inner">
+                    <div class="champ-icon-wrap">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <div class="champ-body">
+                        <div class="champ-lbl">Season Champion</div>
+                        <div class="champ-name" id="champName">—</div>
+                    </div>
+                    <div class="champ-stars">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
                 </div>
             </div>
 
@@ -618,17 +933,19 @@
     <!-- TAB: TABLE -->
     <section id="tab-table" class="tab-section">
         <div id="champBannerTable" class="champ-banner hidden" style="margin-bottom:var(--gap);">
-            <div class="champ-icon-wrap">
-                <i class="fa-solid fa-crown"></i>
-            </div>
-            <div class="champ-body">
-                <div class="champ-lbl">Season Champion</div>
-                <div class="champ-name" id="champNameTable">—</div>
-            </div>
-            <div class="champ-stars">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
+            <div class="champ-inner">
+                <div class="champ-icon-wrap">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div class="champ-body">
+                    <div class="champ-lbl">Season Champion</div>
+                    <div class="champ-name" id="champNameTable">—</div>
+                </div>
+                <div class="champ-stars">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
             </div>
         </div>
         <div class="glass">
@@ -950,11 +1267,53 @@
             }
             f[type] = num;
             const h = f.homeScore, a = f.awayScore;
+            const wasPlayed = f.played;
             f.played = (h !== null && a !== null && !isNaN(h) && !isNaN(a) && h >= 0 && a >= 0);
-            if (f.played) {
-                const card = document.querySelector(`[data-match-id="${id}"]`);
-                if (card) { card.classList.remove('score-flash'); void card.offsetWidth; card.classList.add('score-flash'); }
+
+            /* — Immediately update the match card DOM (before async Firebase round-trip) — */
+            const card = document.querySelector(`[data-match-id="${id}"]`);
+            if (card) {
+                const statusEl = card.querySelector('.mc-status');
+                const idEl     = card.querySelector('.mc-id');
+                if (f.played) {
+                    /* Status badge → FT (green) */
+                    if (statusEl) { statusEl.className = 'mc-status ft'; statusEl.textContent = 'FT'; }
+                    /* Match ID label → green */
+                    if (idEl) idEl.classList.add('played');
+                    card.classList.add('played');
+                    /* Winner highlighting */
+                    const homeTeamEl = card.querySelector('.mc-team.home');
+                    const awayTeamEl = card.querySelector('.mc-team.away');
+                    if (homeTeamEl && awayTeamEl) {
+                        homeTeamEl.classList.remove('winner','loser','draw');
+                        awayTeamEl.classList.remove('winner','loser','draw');
+                        if (h > a)      { homeTeamEl.classList.add('winner'); awayTeamEl.classList.add('loser'); }
+                        else if (a > h) { awayTeamEl.classList.add('winner'); homeTeamEl.classList.add('loser'); }
+                        else            { homeTeamEl.classList.add('draw');   awayTeamEl.classList.add('draw'); }
+                    }
+                    /* Score-half coloring (admin view uses inputs, not .score-half divs) */
+                    const scoreHalves = card.querySelectorAll('.score-half');
+                    if (scoreHalves.length === 2) {
+                        scoreHalves[0].className = scoreHalves[1].className = 'score-half';
+                        if (h > a)      { scoreHalves[0].classList.add('win');    scoreHalves[1].classList.add('lose'); }
+                        else if (a > h) { scoreHalves[0].classList.add('lose');   scoreHalves[1].classList.add('win'); }
+                        else            { scoreHalves[0].classList.add('draw-s'); scoreHalves[1].classList.add('draw-s'); }
+                    }
+                    /* Flash animation */
+                    card.classList.remove('score-flash'); void card.offsetWidth; card.classList.add('score-flash');
+                } else {
+                    /* Score cleared — revert to TBD */
+                    if (statusEl) { statusEl.className = 'mc-status tbd'; statusEl.textContent = 'TBD'; }
+                    if (idEl) idEl.classList.remove('played');
+                    card.classList.remove('played');
+                    const homeTeamEl = card.querySelector('.mc-team.home');
+                    const awayTeamEl = card.querySelector('.mc-team.away');
+                    if (homeTeamEl) homeTeamEl.classList.remove('winner','loser','draw');
+                    if (awayTeamEl) awayTeamEl.classList.remove('winner','loser','draw');
+                    card.querySelectorAll('.score-half').forEach(el => el.className = 'score-half');
+                }
             }
+
             this.calculateStandings();
             this.syncDb();
         },
@@ -1169,13 +1528,25 @@
         renderChampion() {
             const cb1 = document.getElementById('champBanner');
             const cb2 = document.getElementById('champBannerTable');
-            const allDone = this.data.fixtures.length > 0 && this.data.fixtures.every(f => f.played);
-            if (allDone && this.data.standings.length > 0) {
-                if (cb1) cb1.classList.remove('hidden');
-                if (cb2) cb2.classList.remove('hidden');
+            
+            const totalMatches = this.data.fixtures.length;
+            const playedMatches = this.data.fixtures.filter(f => f.played).length;
+            const hasTeams = this.data.standings.length > 0;
+            
+            const isComplete = totalMatches > 0 && playedMatches === totalMatches;
+            const isRunning = totalMatches > 0 && playedMatches > 0 && playedMatches < totalMatches;
+
+            if (isComplete && hasTeams) {
+                if (cb1) { cb1.classList.remove('hidden'); const lbl1 = cb1.querySelector('.champ-lbl'); if (lbl1) lbl1.textContent = 'Season Champion'; }
+                if (cb2) { cb2.classList.remove('hidden'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Champion'; }
                 const el1 = document.getElementById('champName');
                 const el2 = document.getElementById('champNameTable');
                 if (el1) el1.textContent = this.data.standings[0].name;
+                if (el2) el2.textContent = this.data.standings[0].name;
+            } else if (isRunning && hasTeams) {
+                if (cb1) cb1.classList.add('hidden'); // Hide on Home
+                if (cb2) { cb2.classList.remove('hidden'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Leader'; }
+                const el2 = document.getElementById('champNameTable');
                 if (el2) el2.textContent = this.data.standings[0].name;
             } else {
                 if (cb1) cb1.classList.add('hidden');
@@ -1220,28 +1591,40 @@
                     let hCls = '', aCls = '';
                     if (f.played) {
                         const hn = Number(f.homeScore), an = Number(f.awayScore);
-                        if (hn > an)      { hCls = 'winner'; }
-                        else if (hn < an) { aCls = 'winner'; }
+                        if (hn > an)      { hCls = 'winner'; aCls = 'loser'; }
+                        else if (hn < an) { hCls = 'loser';  aCls = 'winner'; }
                         else              { hCls = aCls = 'draw'; }
                     }
+                    /* Score-half coloring for played matches */
+                    let hHalfCls = '', aHalfCls = '';
+                    if (f.played) {
+                        const hn = Number(f.homeScore), an = Number(f.awayScore);
+                        if (hn > an)      { hHalfCls = 'win';    aHalfCls = 'lose'; }
+                        else if (hn < an) { hHalfCls = 'lose';   aHalfCls = 'win'; }
+                        else              { hHalfCls = 'draw-s'; aHalfCls = 'draw-s'; }
+                    }
+                    /* Render score-box differently for admin (editable) vs visitor (display) */
+                    const scoreBoxInner = this.isAdmin
+                        ? `<input type="number" min="0" value="${hv}"
+                                onchange="window.app.updateScore(${f.id},'homeScore',this.value)"
+                                class="score-in admin">
+                           <div class="score-div"></div>
+                           <input type="number" min="0" value="${av}"
+                                onchange="window.app.updateScore(${f.id},'awayScore',this.value)"
+                                class="score-in admin">`
+                        : `<div class="score-half ${hHalfCls}">${hv !== '' ? hv : '–'}</div>
+                           <div class="score-div"></div>
+                           <div class="score-half ${aHalfCls}">${av !== '' ? av : '–'}</div>`;
                     html += `<div class="match-card ${f.played?'played':''}" data-match-id="${f.id}">
                         <div class="mc-top">
-                            <span class="mc-id">M·${String(f.id).padStart(2,'0')}</span>
+                            <span class="mc-id${f.played?' played':''}">M·${String(f.id).padStart(2,'0')}</span>
                             <span class="mc-status ${f.played?'ft':'tbd'}">${f.played?'FT':'TBD'}</span>
                         </div>
                         <div class="mc-row">
                             <div class="mc-team home ${hCls}">
                                 <span title="${f.home}">${f.home}</span>
                             </div>
-                            <div class="score-box">
-                                <input type="number" min="0" value="${hv}"
-                                    onchange="window.app.updateScore(${f.id},'homeScore',this.value)"
-                                    ${dis} class="score-in ${inputCls}">
-                                <span class="score-sep">:</span>
-                                <input type="number" min="0" value="${av}"
-                                    onchange="window.app.updateScore(${f.id},'awayScore',this.value)"
-                                    ${dis} class="score-in ${inputCls}">
-                            </div>
+                            <div class="score-box">${scoreBoxInner}</div>
                             <div class="mc-team away ${aCls}">
                                 <span title="${f.away}">${f.away}</span>
                             </div>
@@ -1311,6 +1694,21 @@
                 if (this.isAdmin && hasTeams) archSec.classList.remove('hidden');
                 else archSec.classList.add('hidden');
             }
+
+            /* — Conditionally show/hide Table tab on mobile bottom nav & desktop tabs — */
+            /* Mobile bottom nav Table button */
+            const mobileTableTab = document.querySelector('#mobileBottomNav .bnav-tab[data-tab="table"]');
+            if (mobileTableTab) {
+                if (hasTeams) mobileTableTab.style.display = '';
+                else          mobileTableTab.style.display = 'none';
+            }
+            /* Desktop Table tab (only between 768–991px; hidden by CSS at ≥992px) */
+            const desktopTableTab = document.querySelector('#desktopTabs .dtab[data-tab="table"]');
+            if (desktopTableTab) {
+                if (hasTeams) desktopTableTab.style.removeProperty('display');
+                else          desktopTableTab.style.display = 'none';
+            }
+
             this._updateAuthUI();
         }
     };
