@@ -537,8 +537,19 @@
     .mc-id { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(96,165,250,0.5); transition: color 0.25s; }
     .mc-id.played { color: var(--green); }
     .mc-status { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; }
-    .mc-status.tbd { color: var(--muted); background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
+    .mc-status.tbd { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
     .mc-status.ft  { color: var(--green); background: rgba(0,255,135,0.1); border: 1px solid rgba(0,255,135,0.28); }
+    
+    .title-decider-badge {
+        display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px;
+        border-radius: 4px; background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.4);
+        color: #f87171; font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        animation: pulse-badge 2s infinite; margin-left: 8px; margin-right: auto;
+    }
+    @keyframes pulse-badge {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+        50% { box-shadow: 0 0 8px 2px rgba(220, 38, 38, 0.2); }
+    }
 
     /* ── mc-row: full-width pill layout ── */
     .mc-row {
@@ -651,18 +662,33 @@
     .empty-state p { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2); }
 
     /* ═══ TABLE TAB ═══ */
-    .table-wrap { overflow-x: auto; }
+    .table-container { position: relative; }
+    .table-container::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 32px;
+        background: linear-gradient(to right, transparent, #040810);
+        pointer-events: none;
+    }
+    @media(min-width: 768px) { .table-container::after { display: none; } } /* Hide fade on desktop if it fits */
+
+    .table-wrap { overflow-x: auto; position: relative; padding-bottom: 4px; }
     .table-wrap::-webkit-scrollbar { height: 3px; }
-    table { width: 100%; min-width: 480px; border-collapse: collapse; }
-    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; background: rgba(255,255,255,0.02); }
-    td { padding: 9px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-2); }
+    table { width: 100%; min-width: 520px; border-collapse: collapse; }
+    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; background: #040810; }
+    td { padding: 9px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-2); background: #040810; }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.025); }
+    tr:hover td { background: #0a111e; }
+    
+    /* Sticky Columns (only on mobile but can be universal since it's responsive) */
+    th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 10; width: 38px; min-width: 38px; max-width: 38px; }
+    th:nth-child(2), td:nth-child(2) { position: sticky; left: 38px; z-index: 10; border-right: 1px solid rgba(255,255,255,0.08); }
+    
     .pos-badge { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 5px; background: rgba(255,255,255,0.08); font-size: 10px; font-weight: 700; }
     .pos-1 { background: rgba(251,191,36,0.22); color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.15); }
-    tr.row-first td { background: rgba(251,191,36,0.04); }
+    
+    tr.row-first td { background: #0b1115; } /* Slight gold tint solid background */
     tr.row-first td:first-child { border-left: 2px solid rgba(251,191,36,0.4); }
-    tr.row-first:hover td { background: rgba(251,191,36,0.06); }
+    tr.row-first:hover td { background: #0e161a; }
+    
     .player-cell { display: flex; align-items: center; gap: 8px; }
     .form-dots { display: flex; align-items: center; justify-content: center; gap: 3px; }
     .fdot { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 8px; font-weight: 900; color: #fff; }
@@ -954,25 +980,27 @@
                     <i class="fa-solid fa-trophy" style="color:var(--gold);"></i> League Table
                 </h2>
             </div>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width:38px;text-align:center;">#</th>
-                            <th>Player</th>
-                            <th style="width:30px;text-align:center;">P</th>
-                            <th style="width:30px;text-align:center;color:var(--green);">W</th>
-                            <th style="width:30px;text-align:center;">D</th>
-                            <th style="width:30px;text-align:center;color:var(--red);">L</th>
-                            <th style="width:34px;text-align:center;">GF</th>
-                            <th style="width:34px;text-align:center;">GA</th>
-                            <th style="width:42px;text-align:center;">GD</th>
-                            <th style="width:50px;text-align:center;color:var(--green);">Pts</th>
-                            <th style="width:94px;text-align:center;">Form</th>
-                        </tr>
-                    </thead>
-                    <tbody id="standingsBody"></tbody>
-                </table>
+            <div class="table-container">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;">#</th>
+                                <th>Player</th>
+                                <th style="width:30px;text-align:center;">P</th>
+                                <th style="width:30px;text-align:center;color:var(--green);">W</th>
+                                <th style="width:30px;text-align:center;">D</th>
+                                <th style="width:30px;text-align:center;color:var(--red);">L</th>
+                                <th style="width:34px;text-align:center;">GF</th>
+                                <th style="width:34px;text-align:center;">GA</th>
+                                <th style="width:42px;text-align:center;">GD</th>
+                                <th style="width:50px;text-align:center;color:var(--green);">Pts</th>
+                                <th style="width:94px;text-align:center;">Form</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standingsBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
@@ -1318,6 +1346,37 @@
             this.syncDb();
         },
 
+        isTitleDecider(match) {
+            if (match.played || !this.data.standings || this.data.standings.length < 2) return false;
+            
+            const leader = this.data.standings[0];
+            if (match.home !== leader.name && match.away !== leader.name) return false;
+            
+            const winPts = this.data.settings.winPts;
+            const projectedLeaderPts = leader.pts + winPts;
+            
+            let isStrictClinch = true;
+            for (let i = 1; i < this.data.standings.length; i++) {
+                const opp = this.data.standings[i];
+                const oppUnplayed = this.data.fixtures.filter(f => !f.played && (f.home === opp.name || f.away === opp.name));
+                let oppRemainingMatches = oppUnplayed.length;
+                
+                // If opponent is playing leader in this match, simulation gives them a loss
+                if (match.home === opp.name || match.away === opp.name) {
+                    oppRemainingMatches = Math.max(0, oppRemainingMatches - 1);
+                }
+                
+                const oppMaxPts = opp.pts + (oppRemainingMatches * winPts);
+                
+                if (projectedLeaderPts <= oppMaxPts) {
+                    isStrictClinch = false;
+                    break;
+                }
+            }
+            
+            return isStrictClinch;
+        },
+
         calculateStandings() {
             const table = {};
             this.data.teams.forEach(n => { table[n] = { name:n, p:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 }; });
@@ -1340,7 +1399,7 @@
         getForm(teamName, n = 5) {
             return this.data.fixtures
                 .filter(f => f.played && (f.home === teamName || f.away === teamName))
-                .slice(-n).reverse()
+                .slice(-n)
                 .map(f => {
                     const mine   = f.home === teamName ? f.homeScore : f.awayScore;
                     const theirs = f.home === teamName ? f.awayScore : f.homeScore;
@@ -1615,9 +1674,16 @@
                         : `<div class="score-half ${hHalfCls}">${hv !== '' ? hv : '–'}</div>
                            <div class="score-div"></div>
                            <div class="score-half ${aHalfCls}">${av !== '' ? av : '–'}</div>`;
+                           
+                    let titleDeciderBadge = '';
+                    if (!f.played && this.isTitleDecider(f)) {
+                        titleDeciderBadge = `<span class="title-decider-badge"><i class="fa-solid fa-trophy"></i> Title Decider</span>`;
+                    }
+                           
                     html += `<div class="match-card ${f.played?'played':''}" data-match-id="${f.id}">
                         <div class="mc-top">
                             <span class="mc-id${f.played?' played':''}">M·${String(f.id).padStart(2,'0')}</span>
+                            ${titleDeciderBadge}
                             <span class="mc-status ${f.played?'ft':'tbd'}">${f.played?'FT':'TBD'}</span>
                         </div>
                         <div class="mc-row">
