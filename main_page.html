@@ -954,16 +954,6 @@
         <!-- Dashboard: shown when teams exist -->
         <div id="homeDash" class="hidden">
 
-            <!-- 1-stat bar -->
-            <div id="statsBar">
-                <div class="glass stat-card">
-                    <div class="stat-ico g"><i class="fa-solid fa-futbol"></i></div>
-                    <div>
-                        <div class="stat-lbl">Matches Played</div>
-                        <div class="stat-val" id="statPlayed">0/0</div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Single champion banner — only when all matches complete -->
             <div id="champBanner" class="champ-banner hidden">
@@ -1222,7 +1212,21 @@
                 } else {
                     this.data = { settings:{ winPts:3, drawPts:1, legs:2 }, teams:[], fixtures:[], standings:[] };
                 }
-                if (!this._dbLoaded) { this._dbLoaded = true; this._tryRender(); }
+                if (!this._dbLoaded) { 
+                    this._dbLoaded = true; 
+                    const upcoming = this.data.fixtures.filter(f => !f.played).length;
+                    if (upcoming > 0) {
+                        this.filterState = 'upcoming';
+                        ['All','Played','Upcoming'].forEach(x => {
+                            const el = document.getElementById('f' + x);
+                            if (el) {
+                                el.classList.toggle('on', x.toLowerCase() === 'upcoming');
+                                el.classList.toggle('off', x.toLowerCase() !== 'upcoming');
+                            }
+                        });
+                    }
+                    this._tryRender(); 
+                }
                 else { this.render(); }
             }, () => this._showError());
 
@@ -1634,9 +1638,17 @@
 
         /* Helper to get simple form W/D/L */
         renderStats() {
-            const total  = this.data.fixtures.length;
-            const played = this.data.fixtures.filter(f => f.played).length;
-            const e1 = document.getElementById('statPlayed'); if (e1) e1.textContent = `${played}/${total}`;
+            const all = this.data.fixtures;
+            const played = all.filter(f => f.played);
+            const upcoming = all.filter(f => !f.played);
+
+            const btnAll = document.getElementById('fAll');
+            const btnPlayed = document.getElementById('fPlayed');
+            const btnUpcoming = document.getElementById('fUpcoming');
+
+            if (btnAll) btnAll.textContent = `All (${all.length})`;
+            if (btnPlayed) btnPlayed.textContent = `Played (${played.length})`;
+            if (btnUpcoming) btnUpcoming.textContent = `Upcoming (${upcoming.length})`;
         },
 
         /* Champion banner — on home and table */
