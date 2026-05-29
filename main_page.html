@@ -485,7 +485,6 @@
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* ── Decorative right-side stars ── */
     .champ-stars {
         position: relative; z-index: 2;
         display: flex; flex-direction: column;
@@ -496,6 +495,24 @@
     .champ-stars i:nth-child(1) { font-size: 14px; animation: borderPulse 2s ease-in-out infinite; }
     .champ-stars i:nth-child(2) { font-size: 10px; animation: borderPulse 2s ease-in-out infinite 0.7s; }
     .champ-stars i:nth-child(3) { font-size: 7px;  animation: borderPulse 2s ease-in-out infinite 1.4s; }
+
+    /* ── Leader overrides (less premium) ── */
+    .champ-banner.is-leader {
+        background: rgba(255,255,255,0.1); 
+        animation: none;
+    }
+    .champ-banner.is-leader .champ-inner { background: rgba(8,10,20,0.85); box-shadow: none; }
+    .champ-banner.is-leader .champ-inner::before { display: none; }
+    .champ-banner.is-leader .champ-icon-wrap {
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        color: var(--text-2); animation: none; box-shadow: none;
+    }
+    .champ-banner.is-leader .champ-lbl { color: var(--muted); }
+    .champ-banner.is-leader .champ-name {
+        background: none; -webkit-text-fill-color: var(--text); color: var(--text);
+        text-shadow: none; font-weight: 800;
+    }
+    .champ-banner.is-leader .champ-stars { display: none; }
 
     /* ═══ FIXTURES (home-integrated) ═══ */
     .fix-filters { display: flex; gap: 5px; padding: 11px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.018); border-radius: var(--r) var(--r) 0 0; }
@@ -662,35 +679,36 @@
     .empty-state p { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-2); }
 
     /* ═══ TABLE TAB ═══ */
-    .table-container { position: relative; }
-    .table-container::after {
-        content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 32px;
-        background: linear-gradient(to right, transparent, #040810);
-        pointer-events: none;
+    #mobileTableToggle {
+        display: none; background: transparent; border: none; color: rgba(255,255,255,0.25);
+        font-size: 13px; cursor: pointer; transition: color 0.2s; padding: 4px;
     }
-    @media(min-width: 768px) { .table-container::after { display: none; } } /* Hide fade on desktop if it fits */
+    #mobileTableToggle.active { color: rgba(255,255,255,0.7); }
+    @media (max-width: 767px) {
+        #mobileTableToggle { display: inline-block; }
+        .table-wrap:not(.show-extra-stats) th:nth-child(7),
+        .table-wrap:not(.show-extra-stats) td:nth-child(7),
+        .table-wrap:not(.show-extra-stats) th:nth-child(8),
+        .table-wrap:not(.show-extra-stats) td:nth-child(8) {
+            display: none;
+        }
+        .table-wrap:not(.show-extra-stats) table { min-width: auto; }
+    }
 
-    .table-wrap { overflow-x: auto; position: relative; padding-bottom: 4px; }
+    .table-wrap { overflow-x: auto; }
     .table-wrap::-webkit-scrollbar { height: 3px; }
-    table { width: 100%; min-width: 520px; border-collapse: collapse; }
-    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; background: #040810; }
-    td { padding: 9px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-2); background: #040810; }
+    table { width: 100%; min-width: 480px; border-collapse: collapse; }
+    th { padding: 10px 9px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-2); border-bottom: 1px solid rgba(255,255,255,0.1); white-space: nowrap; background: rgba(255,255,255,0.02); }
+    td { padding: 9px 9px; font-size: 13px; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-2); }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #0a111e; }
-    
-    /* Sticky Columns (only on mobile but can be universal since it's responsive) */
-    th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 10; width: 38px; min-width: 38px; max-width: 38px; }
-    th:nth-child(2), td:nth-child(2) { position: sticky; left: 38px; z-index: 10; border-right: 1px solid rgba(255,255,255,0.08); }
-    
+    tr:hover td { background: rgba(255,255,255,0.025); }
     .pos-badge { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 5px; background: rgba(255,255,255,0.08); font-size: 10px; font-weight: 700; }
     .pos-1 { background: rgba(251,191,36,0.22); color: var(--gold); box-shadow: 0 0 8px rgba(251,191,36,0.15); }
-    
-    tr.row-first td { background: #0b1115; } /* Slight gold tint solid background */
+    tr.row-first td { background: rgba(251,191,36,0.04); }
     tr.row-first td:first-child { border-left: 2px solid rgba(251,191,36,0.4); }
-    tr.row-first:hover td { background: #0e161a; }
-    
+    tr.row-first:hover td { background: rgba(251,191,36,0.06); }
     .player-cell { display: flex; align-items: center; gap: 8px; }
-    .form-dots { display: flex; align-items: center; justify-content: center; gap: 3px; }
+    .form-dots { display: flex; align-items: center; justify-content: flex-start; gap: 3px; }
     .fdot { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 8px; font-weight: 900; color: #fff; }
     .fdot-W { background: #059669; box-shadow: 0 0 6px rgba(5,150,105,0.4); }
     .fdot-D { background: #b45309; }
@@ -733,9 +751,30 @@
     .hm-icon { font-size: 20px; color: var(--gold); }
     .hm-title { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 800; flex: 1; }
     .hm-body { padding: 16px 20px; }
-    .hm-tabs { display: flex; gap: 5px; margin-bottom: 12px; }
-    .hm-tab { flex: 1; padding: 8px; border-radius: 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: 1px solid var(--border); background: rgba(255,255,255,0.04); color: var(--text-2); transition: 0.15s; font-family: inherit; }
-    .hm-tab.active { background: var(--green-dim); border-color: rgba(0,255,135,0.28); color: var(--green); }
+    .hm-tabs { display: flex; gap: 8px; margin-bottom: var(--gap); }
+    .hm-tab { flex: 1; padding: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; color: var(--text-2); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.2s; text-align: center; }
+    .hm-tab.active { background: rgba(0,255,135,0.1); border-color: rgba(0,255,135,0.3); color: var(--green); }
+    .hm-content { background: rgba(0,0,0,0.2); border-radius: var(--r); padding: 12px; min-height: 200px; border: 1px solid var(--border-lo); }
+    
+    /* History Standings Redesign */
+    .hm-st-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-lo); border-radius: 10px; margin-bottom: 8px; }
+    .hm-st-row.champ-row { background: rgba(251,191,36,0.06); border-color: rgba(251,191,36,0.2); }
+    .hm-st-left { display: flex; align-items: center; gap: 12px; }
+    .hm-st-pos { font-size: 14px; font-weight: 900; color: var(--muted); width: 24px; text-align: center; }
+    .hm-st-row.champ-row .hm-st-pos { color: var(--gold); }
+    .hm-st-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .hm-st-row.champ-row .hm-st-name { color: var(--gold); font-weight: 800; }
+    .hm-st-stats { display: flex; align-items: center; gap: 16px; font-size: 11px; font-weight: 600; color: var(--text-2); }
+    .hm-st-stat-block { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .hm-st-stat-lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .hm-st-pts { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); }
+    .hm-st-row.champ-row .hm-st-pts { color: var(--gold); }
+    
+    @media (max-width: 450px) {
+        .hm-st-stats { gap: 10px; }
+        .hm-st-name { font-size: 13px; }
+    }
+    
     @media (min-width: 992px) {
         .dtab[data-tab="table"],
         .bnav-tab[data-tab="table"] { display: none !important; }
@@ -861,7 +900,7 @@
         <i class="fa-solid fa-trophy"></i> Table
     </button>
     <button class="dtab" data-tab="history" onclick="window.app.switchTab('history')">
-        <i class="fa-solid fa-clock-rotate-left"></i> History
+        <i class="fa-solid fa-award"></i> Hall of Fame
     </button>
 </nav>
 
@@ -979,28 +1018,29 @@
                 <h2 class="panel-title">
                     <i class="fa-solid fa-trophy" style="color:var(--gold);"></i> League Table
                 </h2>
+                <button id="mobileTableToggle" onclick="document.getElementById('leagueTableWrap').classList.toggle('show-extra-stats'); this.classList.toggle('active');" title="Toggle extra stats">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
             </div>
-            <div class="table-container">
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;">#</th>
-                                <th>Player</th>
-                                <th style="width:30px;text-align:center;">P</th>
-                                <th style="width:30px;text-align:center;color:var(--green);">W</th>
-                                <th style="width:30px;text-align:center;">D</th>
-                                <th style="width:30px;text-align:center;color:var(--red);">L</th>
-                                <th style="width:34px;text-align:center;">GF</th>
-                                <th style="width:34px;text-align:center;">GA</th>
-                                <th style="width:42px;text-align:center;">GD</th>
-                                <th style="width:50px;text-align:center;color:var(--green);">Pts</th>
-                                <th style="width:94px;text-align:center;">Form</th>
-                            </tr>
-                        </thead>
-                        <tbody id="standingsBody"></tbody>
-                    </table>
-                </div>
+            <div class="table-wrap" id="leagueTableWrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:38px;text-align:center;">#</th>
+                            <th>Player</th>
+                            <th style="width:30px;text-align:center;">P</th>
+                            <th style="width:30px;text-align:center;color:var(--green);">W</th>
+                            <th style="width:30px;text-align:center;">D</th>
+                            <th style="width:30px;text-align:center;color:var(--red);">L</th>
+                            <th style="width:34px;text-align:center;">GF</th>
+                            <th style="width:34px;text-align:center;">GA</th>
+                            <th style="width:42px;text-align:center;">GD</th>
+                            <th style="width:50px;text-align:center;color:var(--green);">Pts</th>
+                            <th style="width:94px;text-align:center;padding-left:14px;">Form</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsBody"></tbody>
+                </table>
             </div>
         </div>
     </section>
@@ -1009,6 +1049,13 @@
     <section id="tab-history" class="tab-section">
         <div id="historyContent">
             <div id="archiveSection" class="hidden">
+                <button class="btn-archive glass" style="margin-bottom:10px; border: 1px solid rgba(255,255,255,0.05);" onclick="window.app.toggleTitleDecider()">
+                    <i class="fa-solid fa-trophy" style="font-size:18px; color:var(--gold);"></i>
+                    <div style="text-align:left;">
+                        <div style="font-weight:800;font-size:14px;">Title Decider Feature</div>
+                        <div style="font-size:11px;font-weight:700;margin-top:2px;" id="deciderStatus">...</div>
+                    </div>
+                </button>
                 <button class="btn-archive glass" onclick="window.app.archiveSeason()">
                     <i class="fa-solid fa-box-archive" style="font-size:18px;"></i>
                     <div>
@@ -1047,8 +1094,8 @@
         Table
     </button>
     <button class="bnav-tab" data-tab="history" onclick="window.app.switchTab('history')">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-        History
+        <i class="fa-solid fa-award"></i>
+        Hall of Fame
     </button>
 </nav>
 
@@ -1346,7 +1393,9 @@
             this.syncDb();
         },
 
+        /* Title Decider Logic */
         isTitleDecider(match) {
+            if (this.data.settings && this.data.settings.titleDeciderEnabled === false) return false;
             if (match.played || !this.data.standings || this.data.standings.length < 2) return false;
             
             const leader = this.data.standings[0];
@@ -1404,7 +1453,8 @@
                     const mine   = f.home === teamName ? f.homeScore : f.awayScore;
                     const theirs = f.home === teamName ? f.awayScore : f.homeScore;
                     return mine > theirs ? 'W' : mine < theirs ? 'L' : 'D';
-                });
+                })
+                .reverse();
         },
 
         setFilter(f) {
@@ -1512,28 +1562,25 @@
 
             const stView = document.getElementById('hmStView');
             if (s.standings && s.standings.length) {
-                stView.innerHTML = `<div class="table-wrap"><table>
-                    <thead><tr>
-                        <th style="width:38px;text-align:center;">#</th>
-                        <th>Player</th>
-                        <th style="width:30px;text-align:center;">P</th>
-                        <th style="width:30px;text-align:center;">W</th>
-                        <th style="width:30px;text-align:center;">D</th>
-                        <th style="width:30px;text-align:center;">L</th>
-                        <th style="width:42px;text-align:center;">GD</th>
-                        <th style="width:50px;text-align:center;">Pts</th>
-                    </tr></thead>
-                    <tbody>${s.standings.map((t,i) => `<tr class="${i===0?'row-first':''}">
-                        <td style="text-align:center;"><span class="pos-badge ${i===0?'pos-1':''}">${i+1}</span></td>
-                        <td><div class="player-cell"><span style="font-weight:${i===0?'800':'600'};color:${i===0?'var(--gold)':'var(--text)'};">${t.name}</span></div></td>
-                        <td style="text-align:center;">${t.p}</td>
-                        <td style="text-align:center;color:var(--green);font-weight:700;">${t.w}</td>
-                        <td style="text-align:center;">${t.d}</td>
-                        <td style="text-align:center;color:var(--red);font-weight:700;">${t.l}</td>
-                        <td style="text-align:center;color:${t.gd>0?'var(--green)':t.gd<0?'var(--red)':'var(--muted)'};">${t.gd>0?'+'+t.gd:t.gd}</td>
-                        <td style="text-align:center;"><span style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:${i===0?'var(--gold)':'var(--text)'};">${t.pts}</span></td>
-                    </tr>`).join('')}</tbody>
-                </table></div>`;
+                stView.innerHTML = s.standings.map((t,i) => {
+                    const isChamp = i === 0;
+                    const gdColor = t.gd > 0 ? 'var(--green)' : t.gd < 0 ? 'var(--red)' : 'var(--muted)';
+                    const gdStr = t.gd > 0 ? '+'+t.gd : t.gd;
+                    return `<div class="hm-st-row ${isChamp ? 'champ-row' : ''}">
+                        <div class="hm-st-left">
+                            <div class="hm-st-pos">${i+1}</div>
+                            <div class="hm-st-name">${isChamp ? '<i class="fa-solid fa-crown" style="font-size:10px;margin-right:4px;"></i>' : ''}${t.name}</div>
+                        </div>
+                        <div class="hm-st-stats">
+                            <div class="hm-st-stat-block"><span class="hm-st-stat-lbl">P</span><span style="color:var(--text);">${t.p}</span></div>
+                            <div class="hm-st-stat-block"><span class="hm-st-stat-lbl">W</span><span style="color:var(--green);">${t.w}</span></div>
+                            <div class="hm-st-stat-block"><span class="hm-st-stat-lbl">D</span><span style="color:var(--text);">${t.d}</span></div>
+                            <div class="hm-st-stat-block"><span class="hm-st-stat-lbl">L</span><span style="color:var(--red);">${t.l}</span></div>
+                            <div class="hm-st-stat-block"><span class="hm-st-stat-lbl">GD</span><span style="color:${gdColor};">${gdStr}</span></div>
+                            <div class="hm-st-stat-block" style="margin-left:4px;"><span class="hm-st-stat-lbl" style="color:${isChamp?'var(--gold)':'var(--text)'};">PTS</span><span class="hm-st-pts">${t.pts}</span></div>
+                        </div>
+                    </div>`;
+                }).join('');
             } else {
                 stView.innerHTML = '<p style="color:var(--muted);padding:14px 0;">No standings data.</p>';
             }
@@ -1576,7 +1623,16 @@
         },
         closeHistoryModal() { document.getElementById('historyModal').classList.remove('open'); },
 
-        /* Stats — 1 card */
+        /* Title Decider Toggle */
+        toggleTitleDecider() {
+            if (!this.isAdmin || !this.data || !this.data.settings) return;
+            this.data.settings.titleDeciderEnabled = !(this.data.settings.titleDeciderEnabled !== false);
+            set(ref(db, 'seasonData/settings/titleDeciderEnabled'), this.data.settings.titleDeciderEnabled)
+                .then(() => this.render())
+                .catch(e => console.error(e));
+        },
+
+        /* Helper to get simple form W/D/L */
         renderStats() {
             const total  = this.data.fixtures.length;
             const played = this.data.fixtures.filter(f => f.played).length;
@@ -1596,15 +1652,15 @@
             const isRunning = totalMatches > 0 && playedMatches > 0 && playedMatches < totalMatches;
 
             if (isComplete && hasTeams) {
-                if (cb1) { cb1.classList.remove('hidden'); const lbl1 = cb1.querySelector('.champ-lbl'); if (lbl1) lbl1.textContent = 'Season Champion'; }
-                if (cb2) { cb2.classList.remove('hidden'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Champion'; }
+                if (cb1) { cb1.classList.remove('hidden', 'is-leader'); const lbl1 = cb1.querySelector('.champ-lbl'); if (lbl1) lbl1.textContent = 'Season Champion'; }
+                if (cb2) { cb2.classList.remove('hidden', 'is-leader'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Champion'; }
                 const el1 = document.getElementById('champName');
                 const el2 = document.getElementById('champNameTable');
                 if (el1) el1.textContent = this.data.standings[0].name;
                 if (el2) el2.textContent = this.data.standings[0].name;
             } else if (isRunning && hasTeams) {
                 if (cb1) cb1.classList.add('hidden'); // Hide on Home
-                if (cb2) { cb2.classList.remove('hidden'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Leader'; }
+                if (cb2) { cb2.classList.remove('hidden'); cb2.classList.add('is-leader'); const lbl2 = cb2.querySelector('.champ-lbl'); if (lbl2) lbl2.textContent = 'Season Leader'; }
                 const el2 = document.getElementById('champNameTable');
                 if (el2) el2.textContent = this.data.standings[0].name;
             } else {
@@ -1728,7 +1784,7 @@
                     <td style="text-align:center;">${t.ga}</td>
                     <td style="text-align:center;font-weight:700;color:${gdColor};">${gdStr}</td>
                     <td style="text-align:center;"><span style="font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:${isFirst?'var(--gold)':'var(--text)'};">${t.pts}</span></td>
-                    <td style="text-align:center;">${formHtml(t.name)}</td>
+                    <td style="text-align:left;padding-left:14px;">${formHtml(t.name)}</td>
                 </tr>`;
             }).join('');
         },
@@ -1757,7 +1813,15 @@
             }
 
             if (archSec) {
-                if (this.isAdmin && hasTeams) archSec.classList.remove('hidden');
+                if (this.isAdmin && hasTeams) {
+                    archSec.classList.remove('hidden');
+                    const ds = document.getElementById('deciderStatus');
+                    if (ds && this.data.settings) {
+                        const enabled = this.data.settings.titleDeciderEnabled !== false; // defaults to true
+                        ds.textContent = enabled ? 'Currently: ENABLED' : 'Currently: DISABLED';
+                        ds.style.color = enabled ? 'var(--green)' : 'var(--muted)';
+                    }
+                }
                 else archSec.classList.add('hidden');
             }
 
