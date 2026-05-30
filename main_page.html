@@ -536,7 +536,7 @@
         border: 1px solid var(--border);
         display: flex; flex-direction: column; gap: 6px;
         margin-bottom: 5px;
-        transition: border-color 0.2s, background 0.2s;
+        transition: all 0.3s ease;
     }
     .match-card.played {
         background: rgba(0,255,135,0.03);
@@ -582,7 +582,7 @@
         padding: 6px 10px; border-radius: 8px;
         background: rgba(255,255,255,0.03);
         border: 1px solid rgba(255,255,255,0.06);
-        transition: color 0.22s, background 0.22s;
+        transition: all 0.3s ease;
     }
     /* Home team text aligns right */
     .mc-team.home { justify-content: flex-end; }
@@ -718,6 +718,13 @@
     #historyContent { display: flex; flex-direction: column; gap: var(--gap); }
     .btn-archive { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: var(--r); background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.24); color: var(--gold); font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; font-family: inherit; }
     .btn-archive:hover { background: rgba(251,191,36,0.12); }
+    /* Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.1); }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: var(--text-2); transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    input:checked + .slider { background-color: var(--gold); border-color: var(--gold); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #111; }
     .history-empty { text-align: center; padding: 44px 20px; color: var(--muted); font-size: 13px; line-height: 1.7; }
     .history-empty i { display: block; font-size: 34px; margin-bottom: 10px; }
     .hist-card { padding: 13px 16px; display: flex; align-items: center; gap: 13px; cursor: pointer; transition: border-color 0.18s, background 0.18s; margin-bottom: 6px; }
@@ -781,9 +788,9 @@
         
         body:has(#tab-home.active):has(#homeDash:not(.hidden)) #mainContent {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 6fr 4fr;
             align-items: start;
-            gap: 20px;
+            gap: 24px;
         }
         
         body:has(#tab-home.active):has(#homeDash:not(.hidden)) #tab-home,
@@ -791,14 +798,36 @@
             display: contents;
         }
         
-        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #statsBar {
-            grid-column: 1 / -1;
-        }
-        
+        /* Match Feed Column */
         body:has(#tab-home.active):has(#homeDash:not(.hidden)) #homeDash > .glass {
             grid-column: 1;
         }
+        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #fixturesList {
+            max-height: 75vh;
+            overflow-y: auto;
+            padding-right: 8px; /* Breathing room for the scrollbar */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
         
+        /* Custom scrollbar for match feed */
+        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #fixturesList::-webkit-scrollbar {
+            width: 6px;
+        }
+        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #fixturesList::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #fixturesList::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 4px;
+        }
+        body:has(#tab-home.active):has(#homeDash:not(.hidden)) #fixturesList::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        /* League Table Column */
         body:has(#tab-home.active):has(#homeDash:not(.hidden)) #tab-table {
             display: block !important;
             grid-column: 2;
@@ -1039,13 +1068,17 @@
     <section id="tab-history" class="tab-section">
         <div id="historyContent">
             <div id="archiveSection" class="hidden">
-                <button class="btn-archive glass" style="margin-bottom:10px; border: 1px solid rgba(255,255,255,0.05);" onclick="window.app.toggleTitleDecider()">
+                <div class="btn-archive glass" style="margin-bottom:10px; border: 1px solid rgba(255,255,255,0.05); align-items:center; cursor:default;">
                     <i class="fa-solid fa-trophy" style="font-size:18px; color:var(--gold);"></i>
-                    <div style="text-align:left;">
+                    <div style="text-align:left; flex-grow: 1;">
                         <div style="font-weight:800;font-size:14px;">Title Decider Feature</div>
                         <div style="font-size:11px;font-weight:700;margin-top:2px;" id="deciderStatus">...</div>
                     </div>
-                </button>
+                    <label class="switch">
+                        <input type="checkbox" id="titleDeciderToggle" onchange="window.app.toggleTitleDecider()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
                 <button class="btn-archive glass" onclick="window.app.archiveSeason()">
                     <i class="fa-solid fa-box-archive" style="font-size:18px;"></i>
                     <div>
@@ -1174,6 +1207,11 @@
         _authReady: false,
         _historyLoaded: false,
 
+        escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        },
+
         _hideLoader() {
             const ov = document.getElementById('loadingOverlay');
             if (!ov || ov.classList.contains('gone')) return;
@@ -1248,11 +1286,14 @@
 
         syncDb() {
             if (!this.isAdmin) return;
-            set(ref(db, 'seasonData'), this.data).then(() => {
-                const el = document.getElementById('saveStatus');
-                el.classList.remove('hidden');
-                setTimeout(() => el.classList.add('hidden'), 2200);
-            }).catch(e => alert('Save failed: ' + e.message));
+            if (this.syncTimer) clearTimeout(this.syncTimer);
+            this.syncTimer = setTimeout(() => {
+                set(ref(db, 'seasonData'), this.data).then(() => {
+                    const el = document.getElementById('saveStatus');
+                    el.classList.remove('hidden');
+                    setTimeout(() => el.classList.add('hidden'), 2200);
+                }).catch(e => alert('Save failed: ' + e.message));
+            }, 600);
         },
 
         openLogin()  { document.getElementById('loginModal').classList.add('open'); },
@@ -1531,6 +1572,13 @@
                 .catch(e => alert('Archive failed: ' + e.message));
         },
 
+        deleteSeason(ts, event) {
+            event.stopPropagation();
+            if (!confirm('Are you sure you want to permanently delete this archived season?')) return;
+            remove(ref(db, 'archive/' + ts))
+                .catch(e => alert('Delete failed: ' + e.message));
+        },
+
         /* History list */
         renderHistory() {
             const list = document.getElementById('historyList');
@@ -1552,6 +1600,7 @@
                         <div class="hist-champ"><i class="fa-solid fa-crown" style="font-size:10px;margin-right:5px;"></i>${champ}</div>
                         <div class="hist-meta">${teams} players &nbsp;·&nbsp; ${played}/${total} matches</div>
                     </div>
+                    ${this.isAdmin ? `<button class="admin-ctrl" onclick="window.app.deleteSeason('${ts}', event)" style="background:none;border:none;color:var(--red);padding:10px;cursor:pointer;font-size:16px;z-index:2;position:relative;"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     <i class="fa-solid fa-chevron-right hist-arrow"></i>
                 </div>`;
             }).join('');
@@ -1732,11 +1781,13 @@
                     }
                     /* Render score-box differently for admin (editable) vs visitor (display) */
                     const scoreBoxInner = this.isAdmin
-                        ? `<input type="number" min="0" value="${hv}"
+                        ? `<input type="number" min="0" max="99" value="${hv}"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)"
                                 onchange="window.app.updateScore(${f.id},'homeScore',this.value)"
                                 class="score-in admin">
                            <div class="score-div"></div>
-                           <input type="number" min="0" value="${av}"
+                           <input type="number" min="0" max="99" value="${av}"
+                                oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)"
                                 onchange="window.app.updateScore(${f.id},'awayScore',this.value)"
                                 class="score-in admin">`
                         : `<div class="score-half ${hHalfCls}">${hv !== '' ? hv : '–'}</div>
@@ -1756,11 +1807,11 @@
                         </div>
                         <div class="mc-row">
                             <div class="mc-team home ${hCls}">
-                                <span title="${f.home}">${f.home}</span>
+                                <span title="${this.escapeHtml(f.home)}">${this.escapeHtml(f.home)}</span>
                             </div>
                             <div class="score-box">${scoreBoxInner}</div>
                             <div class="mc-team away ${aCls}">
-                                <span title="${f.away}">${f.away}</span>
+                                <span title="${this.escapeHtml(f.away)}">${this.escapeHtml(f.away)}</span>
                             </div>
                         </div>
                     </div>`;
@@ -1786,7 +1837,7 @@
                 return `<tr class="${isFirst?'row-first':''}">
                     <td style="text-align:center;"><span class="pos-badge ${posC}">${i+1}</span></td>
                     <td><div class="player-cell">
-                        <span style="font-weight:${isFirst?'800':'600'};color:${isFirst?'var(--gold)':'var(--text)'};">${t.name}</span>
+                        <span style="font-weight:${isFirst?'800':'600'};color:${isFirst?'var(--gold)':'var(--text)'};">${this.escapeHtml(t.name)}</span>
                     </div></td>
                     <td style="text-align:center;">${t.p}</td>
                     <td style="text-align:center;color:var(--green);font-weight:700;">${t.w}</td>
@@ -1832,6 +1883,8 @@
                         const enabled = this.data.settings.titleDeciderEnabled !== false; // defaults to true
                         ds.textContent = enabled ? 'Currently: ENABLED' : 'Currently: DISABLED';
                         ds.style.color = enabled ? 'var(--green)' : 'var(--muted)';
+                        const toggle = document.getElementById('titleDeciderToggle');
+                        if (toggle) toggle.checked = enabled;
                     }
                 }
                 else archSec.classList.add('hidden');
